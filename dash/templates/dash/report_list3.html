@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Отчет по сегментам и сайтам Июнь 2024</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        h2 {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a href="{% url 'report_list' %}">Общая таблица</a></li>
+        <li><a href="{% url 'report_obsh' %}">Отчет "Общие показатели"</a></li>
+        <li><a href="{% url 'report_srav' %}">Отчет "Сравнение периодов"</a></li>
+        <li><a href="{% url 'report_seg_site' %}">Отчет "По сегментам и сайтам"</a></li>
+        <li><a href="{% url 'report_rus' %}">Отчет "Для Руслана"</a></li>
+        <li><a href="{% url 'report_month' %}">Ежемесячные отчеты (тест)</a></li>
+    </ul>
+</nav>
+<h1>Отчет по сегментам и сайтам Июнь 2024</h1>
+
+<!-- Форма фильтрации -->
+<form method="get">
+    <label for="year">Год:</label>
+    <select id="year" name="year" multiple class="select2">
+        {% for y in years %}
+            <option value="{{ y }}" {% if y in year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="month">Месяц:</label>
+    <select id="month" name="month" multiple class="select2">
+        {% for m, month_name in months %}
+            <option value="{{ m }}" {% if m in month %}selected{% endif %}>{{ month_name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="segment">Сегмент:</label>
+    <select id="segment" name="segment" multiple class="select2">
+        {% for seg in segments %}
+            <option value="{{ seg }}" {% if seg in segment %}selected{% endif %}>{{ seg }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="site">Сайт:</label>
+    <select id="site" name="site" multiple class="select2">
+        {% for s in sites %}
+            <option value="{{ s }}" {% if s in site %}selected{% endif %}>{{ s }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Фильтр</button>
+</form>
+
+<!-- Таблица: Лиды и клики -->
+<h2>Лиды и клики</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Сайт</th>
+            <th>Сегмент</th>
+            <th>Клики</th>
+            <th>Кол-во Лидов</th>
+            <th>Кол-во некач. Лидов</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+            <tr>
+                <td>{{ report.site }}</td>
+                <td>{{ report.segment }}</td>
+                <td>{{ report.clicks }}</td>
+                <td>{{ report.leads }}</td>
+                <td>{{ report.unqualified_leads }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2"><strong>Итого за Июнь</strong></td>
+            <td><strong>{{ total_clicks }}</strong></td>
+            <td><strong>{{ total_leads }}</strong></td>
+            <td><strong>{{ total_unqualified_leads }}</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Среднее за Июнь</strong></td>
+            <td><strong>{{ avg_clicks }}</strong></td>
+            <td><strong>{{ avg_leads }}</strong></td>
+            <td><strong>{{ avg_unqualified_leads }}</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Таблица: Сделки -->
+<h2>Сделки</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Сайт</th>
+            <th>Сегмент</th>
+            <th>Кол-во Сделок</th>
+            <th>Кол-во Сделок качественных</th>
+            <th>Кол-во проваленных Сделок</th>
+            <th>Кол-во проваленных Сделок по причине игнор дел</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in deals_reports %}
+            <tr>
+                <td>{{ report.site }}</td>
+                <td>{{ report.segment }}</td>
+                <td>{{ report.deals }}</td>
+                <td>{{ report.qualified_deals }}</td>
+                <td>{{ report.failed_deals }}</td>
+                <td>{{ report.ignored_failed_deals }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2"><strong>Итого за Июнь</strong></td>
+            <td><strong>{{ total_deals }}</strong></td>
+            <td><strong>{{ total_qualified_deals }}</strong></td>
+            <td><strong>{{ total_failed_deals }}</strong></td>
+            <td><strong>{{ total_ignored_failed_deals }}</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Среднее за Июнь</strong></td>
+            <td><strong>{{ avg_deals }}</strong></td>
+            <td><strong>{{ avg_qualified_deals }}</strong></td>
+            <td><strong>{{ avg_failed_deals }}</strong></td>
+            <td><strong>{{ avg_ignored_failed_deals }}</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Таблица: Конверсии -->
+<h2>Конверсии</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Сайт</th>
+            <th>Сегмент</th>
+            <th>CR% Кликов в Лиды</th>
+            <th>CR% Лидов в Сделки</th>
+            <th>CR% некач. Лидов</th>
+            <th>% конверсии Обращений в Сделку качественную</th>
+            <th>% конверсии в Сделку качественную (после стадии "Встреча")</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in conversion_reports %}
+            <tr>
+                <td>{{ report.site }}</td>
+                <td>{{ report.segment }}</td>
+                <td>{{ report.cr_clicks_to_leads }}</td>
+                <td>{{ report.cr_leads_to_deals }}</td>
+                <td>{{ report.cr_non_quality }}</td>
+                <td>{{ report.conversion_leads_to_quality }}</td>
+                <td>{{ report.conversion_meetings_to_quality }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2"><strong>Общий % за Июнь</strong></td>
+            <td><strong>{{ overall_cr_clicks_to_leads }}</strong></td>
+            <td><strong>{{ overall_cr_leads_to_deals }}</strong></td>
+            <td><strong>{{ overall_cr_non_quality }}</strong></td>
+            <td><strong>{{ overall_conversion_leads_to_quality }}</strong></td>
+            <td><strong>{{ overall_conversion_meetings_to_quality }}</strong></td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- Таблица: Финансовые показатели -->
+<h2>Финансовые показатели</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Сайт</th>
+            <th>Сегмент</th>
+            <th>Бюджет</th>
+            <th>Выручка</th>
+            <th>CPA Лид</th>
+            <th>CPA Сделка</th>
+            <th>CPA выигранной Сделки</th>
+            <th>Средний чек</th>
+            <th>Потери прямые по причине игнора дел</th>
+            <th>Упущенная прибыль</th>
+            <th>ROI %</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in financial_reports %}
+            <tr>
+                <td>{{ report.site }}</td>
+                <td>{{ report.segment }}</td>
+                <td>{{ report.budget }}</td>
+                <td>{{ report.revenue }}</td>
+                <td>{{ report.cpa_lead }}</td>
+                <td>{{ report.cpa_deal }}</td>
+                <td>{{ report.cpa_won }}</td>
+                <td>{{ report.avg_check }}</td>
+                <td>{{ report.direct_losses_ignored }}</td>
+                <td>{{ report.missed_profit }}</td>
+                <td>{{ report.roi }}</td>
+            </tr>
+        {% endfor %}
+        <tr>
+            <td colspan="2"><strong>Итого за Июнь</strong></td>
+            <td><strong>{{ total_budget }}</strong></td>
+            <td><strong>{{ total_revenue }}</strong></td>
+            <td><strong>{{ avg_cpa_lead }}</strong></td>
+            <td><strong>{{ avg_cpa_deal }}</strong></td>
+            <td><strong>{{ avg_cpa_won }}</strong></td>
+            <td><strong>{{ avg_check }}</strong></td>
+            <td><strong>{{ total_losses }}</strong></td>
+            <td><strong>{{ total_missed_profit }}</strong></td>
+            <td><strong>{{ overall_roi }}</strong></td>
+        </tr>
+        <tr>
+            <td colspan="2"><strong>Среднее за Июнь</strong></td>
+            <td><strong>{{ avg_budget }}</strong></td>
+            <td><strong>{{ avg_revenue }}</strong></td>
+            <td colspan="6"></td>
+        </tr>
+    </tbody>
+</table>
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+</script>
+</body>
+</html>

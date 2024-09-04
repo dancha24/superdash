@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список отчетов</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet"/>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <style>
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<nav>
+    <ul>
+        <li><a href="{% url 'report_list' %}">Общая таблица</a></li>
+        <li><a href="{% url 'report_obsh' %}">Отчет "Общие показатели"</a></li>
+        <li><a href="{% url 'report_srav' %}">Отчет "Сравнение периодов"</a></li>
+        <li><a href="{% url 'report_seg_site' %}">Отчет "По сегментам и сайтам"</a></li>
+        <li><a href="{% url 'report_rus' %}">Отчет "Для Руслана"</a></li>
+        <li><a href="{% url 'report_month' %}">Ежемесячные отчеты (тест)</a></li>
+    </ul>
+</nav>
+
+<h1>{{ title }}</h1>
+
+<form method="get">
+    <h2>Период 1</h2>
+    <label for="year">Год:</label>
+    <select id="year" name="year" multiple class="select2">
+        {% for y in years %}
+            <option value="{{ y }}" {% if y in year %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="month">Месяц:</label>
+    <select id="month" name="month" multiple class="select2">
+        {% for m, month_name in months %}
+            <option value="{{ m }}" {% if m in month %}selected{% endif %}>{{ month_name }}</option>
+        {% endfor %}
+    </select>
+
+    <button type="submit">Фильтр</button>
+</form>
+
+{% if reports %}
+    <h2>Лиды и клики</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Период</th>
+            <th>Клики</th>
+            <th>Кол-во Лидов</th>
+            <th>Кол-во некач. Лидов</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Среднее</strong></td>
+            <td><strong>{{ avg_total_clicks }}</strong></td>
+            <td><strong>{{ avg_total_leads }}</strong></td>
+            <td><strong>{{ avg_total_unqualified_leads }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 1</strong></td>
+            <td><strong>{{ total_clicks }}</strong></td>
+            <td><strong>{{ total_leads }}</strong></td>
+            <td><strong>{{ total_unqualified_leads }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 2</strong></td>
+            <td><strong>{{ total_clicks2 }}</strong></td>
+            <td><strong>{{ total_leads2 }}</strong></td>
+            <td><strong>{{ total_unqualified_leads2 }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>{{ sum_total_clicks }}</strong></td>
+            <td><strong>{{ sum_total_leads }}</strong></td>
+            <td><strong>{{ sum_total_unqualified_leads }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>{{ rost_total_clicks }}</strong></td>
+            <td><strong>{{ rost_total_leads }}</strong></td>
+            <td><strong>{{ rost_total_unqualified_leads }}</strong></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <h2>Сделки</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Период</th>
+            <th>Кол-во Сделок</th>
+            <th>Кол-во Сделок качественных</th>
+            <th>Кол-во проваленных Сделок</th>
+            <th>Кол-во проваленных Сделок по причине игнор дел</th>
+
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Среднее</strong></td>
+            <td><strong>{{ avg_total_deals }}</strong></td>
+            <td><strong>{{ avg_total_qualified_deals }}</strong></td>
+            <td><strong>{{ avg_total_failed_deals }}</strong></td>
+            <td><strong>{{ avg_total_ignored_failed_deals }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 1</strong></td>
+            <td><strong>{{ total_deals }}</strong></td>
+            <td><strong>{{ total_qualified_deals }}</strong></td>
+            <td><strong>{{ total_failed_deals }}</strong></td>
+            <td><strong>{{ total_ignored_failed_deals }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 2</strong></td>
+            <td><strong>{{ total_deals2 }}</strong></td>
+            <td><strong>{{ total_qualified_deals2 }}</strong></td>
+            <td><strong>{{ total_failed_deals2 }}</strong></td>
+            <td><strong>{{ total_ignored_failed_deals2 }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>{{ sum_total_deals }}</strong></td>
+            <td><strong>{{ sum_total_qualified_deals }}</strong></td>
+            <td><strong>{{ sum_total_failed_deals }}</strong></td>
+            <td><strong>{{ sum_total_ignored_failed_deals }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>{{ rost_total_deals }}</strong></td>
+            <td><strong>{{ rost_total_qualified_deals }}</strong></td>
+            <td><strong>{{ rost_total_failed_deals }}</strong></td>
+            <td><strong>{{ rost_total_ignored_failed_deals }}</strong></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Конверсии</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Период</th>
+            <th>CR% Кликов в Лиды</th>
+            <th>CR% Лидов в Сделки</th>
+            <th>CR% некач. Лидов</th>
+            <th>% конверсии Обращений в Сделку качественную</th>
+            <th>% конверсии в Сделку качественную (после стадии "Встреча")</th>
+            <th>% провала Сделки</th>
+            <th>% провала Сделок по причине игнор дел</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Среднее</strong></td>
+            <td><strong>{{ avg_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 1</strong></td>
+            <td><strong>{{ conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 2</strong></td>
+            <td><strong>{{ conversion_rate_clicks_to_leads2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_leads_to_deals2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_unqualified2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_qualified_leds_to_deals2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_qualified_deals2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_failed_deals2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ conversion_rate_ignored_failed_deals2|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>{{ sum_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>{{ rost_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+        </tr>
+        </tbody>
+    </table>
+
+
+    <h2>Финансовые показатели</h2>
+    <table>
+        <thead>
+        <tr>
+            <th>Период</th>
+            <th>Бюджет</th>
+            <th>Выручка</th>
+            <th>CPA Лид</th>
+            <th>CPA Сделка</th>
+            <th>CPA выигранной Сделки</th>
+            <th>Средний чек</th>
+            <th>Потери прямые по причине игнора дел</th>
+            <th>Упущенная прибыль</th>
+            <th>ROI %</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td><strong>Среднее</strong></td>
+            <td><strong>{{ avg_total_budget }}</strong></td>
+            <td><strong>{{ avg_total_revenue }}</strong></td>
+            <td><strong>{{ avg_avg_cpa_lead|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_avg_cpa_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_avg_cpa_won_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_revenue_per_qualified_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_direct_losses_ignored|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_missed_profit|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_roi|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 1</strong></td>
+            <td><strong>{{ total_budget }}</strong></td>
+            <td><strong>{{ total_revenue }}</strong></td>
+            <td><strong>{{ avg_cpa_lead|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_cpa_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_cpa_won_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ revenue_per_qualified_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ direct_losses_ignored|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ missed_profit|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ roi|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Период 2</strong></td>
+            <td><strong>{{ total_budget2 }}</strong></td>
+            <td><strong>{{ total_revenue2 }}</strong></td>
+            <td><strong>{{ avg_cpa_lead2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_cpa_deal2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_cpa_won_deal2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ revenue_per_qualified_deal2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ direct_losses_ignored2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ missed_profit2|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ roi2|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>Итого за  месяца</strong></td>
+            <td><strong>{{ sum_total_budget }}</strong></td>
+            <td><strong>{{ sum_total_revenue }}</strong></td>
+            <td><strong>{{ sum_avg_cpa_lead|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_avg_cpa_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_avg_cpa_won_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_revenue_per_qualified_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_direct_losses_ignored|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_missed_profit|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ sum_roi|default:"Н/Д" }}</strong></td>
+        </tr>
+        <tr>
+            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>{{ rost_total_budget }}</strong></td>
+            <td><strong>{{ rost_total_revenue }}</strong></td>
+            <td><strong>{{ rost_avg_cpa_lead|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_avg_cpa_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_avg_cpa_won_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_revenue_per_qualified_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_direct_losses_ignored|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_missed_profit|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ rost_roi|default:"Н/Д" }}</strong></td>
+        </tr>
+        </tbody>
+    </table>
+
+{% else %}
+    <p>Нет доступных отчетов.</p>
+{% endif %}
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2();
+    });
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+{% extends layout_path %}
+
+{% load static %}
+{% load i18n %}
+
+{% block title %}Dashboard - CRM{% endblock title %}
+
+{% block vendor_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-bs5/datatables.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/apex-charts/apex-charts.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/libs/swiper/swiper.css' %}" />
+{% endblock vendor_css %}
+
+{% block vendor_js %}
+{{ block.super }}
+<script src="{% static 'vendor/libs/datatables-bs5/datatables-bootstrap5.js' %}"></script>
+<script src="{% static 'vendor/libs/apex-charts/apexcharts.js' %}"></script>
+<script src="{% static 'vendor/libs/swiper/swiper.js' %}"></script>
+{% endblock vendor_js %}
+
+{% block page_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'vendor/css/pages/cards-statistics.css' %}" />
+<link rel="stylesheet" href="{% static 'vendor/css/pages/cards-analytics.css' %}" />
+{% endblock page_css %}
+
+{% block page_js %}
+{{ block.super }}
+<script src="{% static 'js/dashboards-crm.js' %}"></script>
+{% endblock page_js %}
+
+{% block content %}
+
+<h4 class="py-3 mb-6">{% translate "Title: Test Page" %}</h4>
+<p>Content: Test page.</p>
+    <!-- Total Growth chart -->
+  <div class="col-xxl-2 col-md-3 col-sm-6">
+    <div class="card h-100">
+      <div class="card-header">
+        <div class="d-flex align-items-center mb-1 flex-wrap">
+          <h5 class="mb-0 me-1">$27.9k</h5>
+          <p class="mb-0 text-success">+16%</p>
+        </div>
+        <span class="d-block card-subtitle">Total Growth</span>
+      </div>
+      <div class="card-body">
+        <div id="totalGrowthChart"></div>
+      </div>
+    </div>
+  </div>
+  <!--/ Total Sales chart -->
+
+{% endblock %}
