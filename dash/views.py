@@ -3150,7 +3150,7 @@ class ReportTest(TemplateView):
         revenue = Report.get_name_list('deals', reports)
 
         context.update({
-            'title': 'Тест отчета',
+            'title': 'Тест отчета 1',
             'total_budget': Report.total_sum_column('budget'),
             'total_revenue': Report.total_sum_column('revenue'),
             'total_deals': Report.total_sum_column('deals'),
