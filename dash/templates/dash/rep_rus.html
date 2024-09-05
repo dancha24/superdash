@@ -238,7 +238,7 @@
         </tr>
         <tr>
             <td><strong>% изменения относительно прошлого месяца</strong></td>
-            <td  class="table-{% if rost_conversion_rate_clicks_to_leads > 0 %}danger{% elif rost_conversion_rate_clicks_to_leads < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td  class="table-{% if rost_conversion_rate_clicks_to_leads > 0 %}success{% elif rost_conversion_rate_clicks_to_leads < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
             <td  class="table-{% if rost_conversion_rate_leads_to_deals > 0 %}success{% elif rost_conversion_rate_leads_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
             <td  class="table-{% if rost_conversion_rate_unqualified > 0 %}danger{% elif rost_conversion_rate_unqualified < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
             <td  class="table-{% if rost_conversion_rate_qualified_leds_to_deals > 0 %}success{% elif rost_conversion_rate_qualified_leds_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
