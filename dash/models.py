@@ -1,6 +1,22 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.db.models import Sum
+from django.db.models.functions import ExtractMonth, ExtractYear
+
+MONTHS = {
+    1: "Январь",
+    2: "Февраль",
+    3: "Март",
+    4: "Апрель",
+    5: "Май",
+    6: "Июнь",
+    7: "Июль",
+    8: "Август",
+    9: "Сентябрь",
+    10: "Октябрь",
+    11: "Ноябрь",
+    12: "Декабрь"
+}
 
 
 class Report(models.Model):
@@ -108,6 +124,17 @@ class Report(models.Model):
         if queryset is None:
             queryset = cls.objects.all()
         return list(queryset.values_list(name, flat=True))
+
+    # варианты полей для фильтров
+    @classmethod
+    def get_list_of_variant(cls):
+        months = cls.objects.annotate(month=ExtractMonth('start_period')).values_list('month', flat=True).distinct()
+        return {
+            'years': list(map(str, cls.objects.annotate(year=ExtractYear('start_period')).values_list('year',flat=True).distinct())),
+            'months': sorted([(m, MONTHS[m]) for m in months if m in MONTHS.keys()]),
+            'segments': cls.objects.values_list('segment', flat=True).distinct(),
+            'sites': cls.objects.values_list('site', flat=True).distinct(),
+        }
 
     class Meta:
         verbose_name = "Отчет"
