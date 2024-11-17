@@ -102,7 +102,7 @@
                 <label for="year2">Год:</label>
                 <select id="year2" name="year2" multiple class="selectpicker w-100" data-style="btn-default"
                         data-actions-box="true">
-                  {% for y in years2 %}
+                  {% for y in years %}
                     <option value="{{ y }}" {% if y in year2 %}selected{% endif %}>{{ y }}</option>
                   {% endfor %}
                 </select>
@@ -114,7 +114,7 @@
                 <label for="month2">Месяц:</label>
                 <select id="month2" name="month2" multiple class="selectpicker w-100" data-style="btn-default"
                         data-actions-box="true">
-                  {% for m, month_name in months2 %}
+                  {% for m, month_name in months %}
                     <option value="{{ m }}" {% if m in month2 %}selected{% endif %}>{{ month_name }}</option>
                   {% endfor %}
                 </select>
@@ -126,7 +126,7 @@
                 <label for="segment2">Сегмент:</label>
                 <select id="segment2" name="segment2" multiple class="selectpicker w-100" data-style="btn-default"
                         data-actions-box="true">
-                  {% for seg in segments2 %}
+                  {% for seg in segments %}
                     <option value="{{ seg }}" {% if seg in segment2 %}selected{% endif %}>{{ seg }}</option>
                   {% endfor %}
                 </select>
@@ -138,7 +138,7 @@
                 <label for="site2">Сайт:</label>
                 <select id="site2" name="site2" multiple class="selectpicker w-100" data-style="btn-default"
                         data-actions-box="true">
-                  {% for s in sites2 %}
+                  {% for s in sites %}
                     <option value="{{ s }}" {% if s in site2 %}selected{% endif %}>{{ s }}</option>
                   {% endfor %}
                 </select>
@@ -178,25 +178,25 @@
             <td><strong>{{ avg_total_unqualified_leads }}</strong></td>
           </tr>
           <tr>
-            <td><strong>Период 1</strong></td>
+            <td><strong>{{ namefilter }}</strong></td>
             <td>{{ total_clicks }}</td>
             <td>{{ total_leads }}</td>
             <td>{{ total_unqualified_leads }}</td>
           </tr>
           <tr>
-            <td><strong>Период 2</strong></td>
+            <td><strong>{{ namefilter2 }}</strong></td>
             <td>{{ total_clicks2 }}</td>
             <td>{{ total_leads2 }}</td>
             <td>{{ total_unqualified_leads2 }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 периода</strong></td>
+            <td><strong>Итого</strong></td>
             <td><strong>{{ sum_total_clicks }}</strong></td>
             <td><strong>{{ sum_total_leads }}</strong></td>
             <td><strong>{{ sum_total_unqualified_leads }}</strong></td>
           </tr>
           <tr>
-            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>% изменения 2 относительно 1</strong></td>
             <td class="table-{% if rost_total_clicks > 0 %}success{% elif rost_total_clicks < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_clicks }}</strong></td>
             <td class="table-{% if rost_total_leads > 0 %}success{% elif rost_total_leads < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_leads }}</strong></td>
             <td class="table-{% if rost_total_unqualified_leads > 0 %}danger{% elif rost_total_unqualified_leads < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_total_unqualified_leads }}</strong></td>
@@ -228,28 +228,28 @@
             <td><strong>{{ avg_total_ignored_failed_deals }}</strong></td>
           </tr>
           <tr>
-            <td><strong>Период 1</strong></td>
+            <td><strong>{{ namefilter }}</strong></td>
             <td>{{ total_deals }}</td>
             <td>{{ total_qualified_deals }}</td>
             <td>{{ total_failed_deals }}</td>
             <td>{{ total_ignored_failed_deals }}</td>
           </tr>
           <tr>
-            <td><strong>Период 2</strong></td>
+            <td><strong>{{ namefilter2 }}</strong></td>
             <td>{{ total_deals2 }}</td>
             <td>{{ total_qualified_deals2 }}</td>
             <td>{{ total_failed_deals2 }}</td>
             <td>{{ total_ignored_failed_deals2 }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 периода</strong></td>
+            <td><strong>Итого</strong></td>
             <td><strong>{{ sum_total_deals }}</strong></td>
             <td><strong>{{ sum_total_qualified_deals }}</strong></td>
             <td><strong>{{ sum_total_failed_deals }}</strong></td>
             <td><strong>{{ sum_total_ignored_failed_deals }}</strong></td>
           </tr>
           <tr>
-            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>% изменения 2 относительно 1</strong></td>
             <td class="table-{% if rost_total_deals > 0 %}success{% elif rost_total_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_deals }}</strong></td>
             <td class="table-{% if rost_total_qualified_deals > 0 %}success{% elif rost_total_qualified_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_qualified_deals }}</strong></td>
             <td class="table-{% if rost_total_failed_deals > 0 %}danger{% elif rost_total_failed_deals < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_total_failed_deals }}</strong></td>
@@ -288,7 +288,7 @@
             <td><strong>{{ avg_conversion_rate_ignored_failed_deals }}</strong></td>
           </tr>
           <tr>
-            <td><strong>Период 1</strong></td>
+            <td><strong>{{ namefilter }}</strong></td>
             <td>{{ conversion_rate_clicks_to_leads }}</td>
             <td>{{ conversion_rate_leads_to_deals }}</td>
             <td>{{ conversion_rate_unqualified }}</td>
@@ -298,7 +298,7 @@
             <td>{{ conversion_rate_ignored_failed_deals }}</td>
           </tr>
           <tr>
-            <td><strong>Период 2</strong></td>
+            <td><strong>{{ namefilter2 }}</strong></td>
             <td>{{ conversion_rate_clicks_to_leads2|default:"Н/Д" }}</td>
             <td>{{ conversion_rate_leads_to_deals2|default:"Н/Д" }}</td>
             <td>{{ conversion_rate_unqualified2|default:"Н/Д" }}</td>
@@ -308,7 +308,7 @@
             <td>{{ conversion_rate_ignored_failed_deals2|default:"Н/Д" }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 периода</strong></td>
+            <td><strong>Итого</strong></td>
             <td><strong>{{ sum_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
             <td><strong>{{ sum_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
             <td><strong>{{ sum_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
@@ -318,7 +318,7 @@
             <td><strong>{{ sum_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
           </tr>
           <tr>
-            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>% изменения 2 относительно 1</strong></td>
             <td class="table-{% if rost_conversion_rate_clicks_to_leads > 0 %}success{% elif rost_conversion_rate_clicks_to_leads < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_clicks_to_leads }}</strong></td>
             <td class="table-{% if rost_conversion_rate_leads_to_deals > 0 %}success{% elif rost_conversion_rate_leads_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_leads_to_deals }}</strong></td>
             <td class="table-{% if rost_conversion_rate_unqualified > 0 %}danger{% elif rost_conversion_rate_unqualified < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_unqualified }}</strong></td>
@@ -364,7 +364,7 @@
             <td><strong>{{ avg_roi|default:"Н/Д" }}</strong></td>
           </tr>
           <tr>
-            <td><strong>Период 1</strong></td>
+            <td><strong>{{ namefilter }}</strong></td>
             <td>{{ total_budget }}</td>
             <td>{{ total_revenue }}</td>
             <td>{{ avg_cpa_lead }}</td>
@@ -376,7 +376,7 @@
             <td>{{ roi }}</td>
           </tr>
           <tr>
-            <td><strong>Период 2</strong></td>
+            <td><strong>{{ namefilter2 }}</strong></td>
             <td>{{ total_budget2 }}</td>
             <td>{{ total_revenue2 }}</td>
             <td>{{ avg_cpa_lead2|default:"Н/Д" }}</td>
@@ -388,7 +388,7 @@
             <td>{{ roi2|default:"Н/Д" }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 периода</strong></td>
+            <td><strong>Итого</strong></td>
             <td><strong>{{ sum_total_budget }}</strong></td>
             <td><strong>{{ sum_total_revenue }}</strong></td>
             <td><strong>{{ sum_avg_cpa_lead|default:"Н/Д" }}</strong></td>
@@ -400,7 +400,7 @@
             <td><strong>{{ sum_roi|default:"Н/Д" }}</strong></td>
           </tr>
           <tr>
-            <td><strong>% изменения относительно прошлого месяца</strong></td>
+            <td><strong>% изменения 2 относительно 1</strong></td>
             <td class="table-{% if rost_total_budget > 0 %}danger{% elif rost_total_budget < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_total_budget }}</strong></td>
             <td class="table-{% if rost_total_revenue > 0 %}success{% elif rost_total_revenue < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_revenue }}</strong></td>
             <td class="table-{% if rost_avg_cpa_lead > 0 %}danger{% elif rost_avg_cpa_lead < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_avg_cpa_lead|default:"Н/Д" }}</strong></td>

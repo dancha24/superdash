@@ -28,6 +28,50 @@ MONTHS = {
 }
 
 
+def screenfilter(year, month, segment, site):
+    mon = ''
+    t = 0
+    for m in month:
+        if t == 0:
+            mon += MONTHS[m]
+        else:
+            mon += ', ' + MONTHS[m]
+        t += 1
+    return (f'{",".join(year) or "Все Года"} | {mon or "Все Месяца"} | {",".join(segment) or "Все Сегменты"} | {",".join(site) or "Все Сайты"}')
+
+
+def filters(self, iterat=''):
+    year = self.request.GET.getlist('year'+iterat)
+    month = list(map(int, self.request.GET.getlist('month'+iterat)))
+    segment = self.request.GET.getlist('segment'+iterat)
+    site = self.request.GET.getlist('site'+iterat)
+
+    return year, month, segment, site
+
+
+def getffff():
+    years = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()))
+    months = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month', flat=True).distinct()
+    segments = Report.objects.values_list('segment', flat=True).distinct()
+    sites = Report.objects.values_list('site', flat=True).distinct()
+    months = sorted([(m, MONTHS[m]) for m in months if m in MONTHS.keys()])
+
+
+def getrep(year, month, segment, site):
+
+    reports = Report.objects.all()
+
+    if year:
+        reports = reports.filter(start_period__year__in=year)
+    if month:
+        reports = reports.filter(start_period__month__in=month)
+    if segment:
+        reports = reports.filter(segment__in=segment)
+    if site:
+        reports = reports.filter(site__in=site)
+
+    return reports
+
 def report_list(request):
     year = request.GET.getlist('year')
     month = request.GET.getlist('month')
@@ -1959,10 +2003,7 @@ class ReportSegSite(TemplateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
-        year = self.request.GET.getlist('year')
-        month = self.request.GET.getlist('month')
-        segment = self.request.GET.getlist('segment')
-        site = self.request.GET.getlist('site')
+        year, month, segment, site = filters(self)
 
         reports = Report.objects.all()
 
@@ -1975,7 +2016,8 @@ class ReportSegSite(TemplateView):
         if site:
             reports = reports.filter(site__in=site)
 
-        years = Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()
+        years = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()))
+        # years = Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()
         months = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month',
                                                                                          flat=True).distinct().order_by(
             'month')
@@ -2119,59 +2161,15 @@ class ReportSrav(TemplateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
-        if not self.request.GET:
-            print('Нет гета')
-        else:
-            print('Есть гет')
+        for_filter = Report.get_list_of_variant()  # получаем варинты для фильтров на странице
 
-        year = self.request.GET.getlist('year')
-        month = list(map(int, self.request.GET.getlist('month')))
-        segment = self.request.GET.getlist('segment')
-        site = self.request.GET.getlist('site')
+        # 1 фильтр
+        year, month, segment, site = filters(self)  # получаем фильтры из адресной строки
+        reports = getrep(year, month, segment, site)  # получаем строки отчетов по фильтру
 
-        reports = Report.objects.all()
-
-        if year:
-            reports = reports.filter(start_period__year__in=year)
-        if month:
-            reports = reports.filter(start_period__month__in=month)
-        if segment:
-            reports = reports.filter(segment__in=segment)
-        if site:
-            reports = reports.filter(site__in=site)
-
-        years = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()))
-        months = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month', flat=True).distinct()
-        segments = Report.objects.values_list('segment', flat=True).distinct()
-        sites = Report.objects.values_list('site', flat=True).distinct()
-
-        months = sorted([(m, MONTHS[m]) for m in months if m in MONTHS.keys()])
-
-        year2 = self.request.GET.getlist('year2')
-        month2 = list(map(int, self.request.GET.getlist('month2')))
-        segment2 = self.request.GET.getlist('segment2')
-        site2 = self.request.GET.getlist('site2')
-
-        reports2 = Report.objects.all()
-
-        if year2:
-            reports2 = reports2.filter(start_period__year__in=year2)
-        if month2:
-            reports2 = reports2.filter(start_period__month__in=month2)
-        if segment2:
-            reports2 = reports2.filter(segment__in=segment2)
-        if site2:
-            reports2 = reports2.filter(site__in=site2)
-
-        years2 = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year',
-                                                                                                    flat=True).distinct()))
-        months2 = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month',
-                                                                                          flat=True).distinct().order_by(
-            'month')
-        segments2 = Report.objects.values_list('segment', flat=True).distinct()
-        sites2 = Report.objects.values_list('site', flat=True).distinct()
-
-        months2 = sorted([(m, MONTHS[m]) for m in months2 if m in MONTHS.keys()])
+        # 2 фильтр
+        year2, month2, segment2, site2 = filters(self, '2')
+        reports2 = getrep(year2, month2, segment2, site2)
 
         avg_missed_profit_igore = 0
         count_missed_profit = 0
@@ -2384,21 +2382,24 @@ class ReportSrav(TemplateView):
             rost_conversion_rate_failed_deals = round((conversion_rate_failed_deals2 - conversion_rate_failed_deals) / conversion_rate_failed_deals * 100, 2)
         except (ZeroDivisionError, ValueError):
             rost_conversion_rate_failed_deals = 0
-        print(rost_conversion_rate_failed_deals)
 
         context.update({
             'title': 'Отчет сравнение периодов ' + str(month) + ' ' + str(year) + ' ' + str(month2) + ' ' + str(year2),
 
+            # для фильтра
+            'years': for_filter['years'],
+            'months': for_filter['months'],
+            'segments': for_filter['segments'],
+            'sites': for_filter['sites'],
+
             # для периода 1
             'reports': reports,
-            'years': years,
             'year': year,
-            'months': months,
-            'segments': segments,
-            'sites': sites,
             'month': month,
             'segment': segment,
             'site': site,
+            "namefilter": screenfilter(year, month, segment, site),
+
             'total_budget': total_budget,
             'total_clicks': total_clicks,
             'total_leads': total_leads,
@@ -2439,14 +2440,11 @@ class ReportSrav(TemplateView):
             # для периода 2
 
             'reports2': reports2,
-            'years2': years2,
-            'months2': months2,
-            'segments2': segments2,
-            'sites2': sites2,
             'year2': year2,
             'month2': month2,
             'segment2': segment2,
             'site2': site2,
+            "namefilter2": screenfilter(year2, month2, segment2, site2),
             'total_budget2': total_budget2,
             'total_clicks2': total_clicks2,
             'total_leads2': total_leads2,
