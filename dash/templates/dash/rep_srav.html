@@ -190,7 +190,7 @@
             <td>{{ total_unqualified_leads2 }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>Итого за 2 периода</strong></td>
             <td><strong>{{ sum_total_clicks }}</strong></td>
             <td><strong>{{ sum_total_leads }}</strong></td>
             <td><strong>{{ sum_total_unqualified_leads }}</strong></td>
@@ -242,7 +242,7 @@
             <td>{{ total_ignored_failed_deals2 }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>Итого за 2 периода</strong></td>
             <td><strong>{{ sum_total_deals }}</strong></td>
             <td><strong>{{ sum_total_qualified_deals }}</strong></td>
             <td><strong>{{ sum_total_failed_deals }}</strong></td>
@@ -285,17 +285,17 @@
             <td><strong>{{ avg_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
             <td><strong>{{ avg_conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
             <td><strong>{{ avg_conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ avg_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ avg_conversion_rate_ignored_failed_deals }}</strong></td>
           </tr>
           <tr>
             <td><strong>Период 1</strong></td>
-            <td>{{ conversion_rate_clicks_to_leads|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_leads_to_deals|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_unqualified|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_qualified_deals|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_failed_deals|default:"Н/Д" }}</td>
-            <td>{{ conversion_rate_ignored_failed_deals|default:"Н/Д" }}</td>
+            <td>{{ conversion_rate_clicks_to_leads }}</td>
+            <td>{{ conversion_rate_leads_to_deals }}</td>
+            <td>{{ conversion_rate_unqualified }}</td>
+            <td>{{ conversion_rate_qualified_leds_to_deals }}</td>
+            <td>{{ conversion_rate_qualified_deals }}</td>
+            <td>{{ conversion_rate_failed_deals }}</td>
+            <td>{{ conversion_rate_ignored_failed_deals }}</td>
           </tr>
           <tr>
             <td><strong>Период 2</strong></td>
@@ -308,7 +308,7 @@
             <td>{{ conversion_rate_ignored_failed_deals2|default:"Н/Д" }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за 2 месяца</strong></td>
+            <td><strong>Итого за 2 периода</strong></td>
             <td><strong>{{ sum_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
             <td><strong>{{ sum_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
             <td><strong>{{ sum_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
@@ -319,13 +319,13 @@
           </tr>
           <tr>
             <td><strong>% изменения относительно прошлого месяца</strong></td>
-            <td class="table-{% if rost_conversion_rate_clicks_to_leads > 0 %}success{% elif rost_conversion_rate_clicks_to_leads < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_clicks_to_leads|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_leads_to_deals > 0 %}success{% elif rost_conversion_rate_leads_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_leads_to_deals|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_unqualified > 0 %}danger{% elif rost_conversion_rate_unqualified < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_unqualified|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_qualified_leds_to_deals > 0 %}success{% elif rost_conversion_rate_qualified_leds_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_qualified_deals > 0 %}success{% elif rost_conversion_rate_qualified_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_qualified_deals|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_failed_deals > 0 %}danger{% elif rost_conversion_rate_failed_deals < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_failed_deals|default:"Н/Д" }}</strong></td>
-            <td class="table-{% if rost_conversion_rate_ignored_failed_deals > 0 %}danger{% elif rost_conversion_rate_ignored_failed_deals < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_clicks_to_leads > 0 %}success{% elif rost_conversion_rate_clicks_to_leads < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_clicks_to_leads }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_leads_to_deals > 0 %}success{% elif rost_conversion_rate_leads_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_leads_to_deals }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_unqualified > 0 %}danger{% elif rost_conversion_rate_unqualified < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_unqualified }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_qualified_leds_to_deals > 0 %}success{% elif rost_conversion_rate_qualified_leds_to_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_qualified_leds_to_deals }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_qualified_deals > 0 %}success{% elif rost_conversion_rate_qualified_deals < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_qualified_deals }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_failed_deals > 0 %}danger{% elif rost_conversion_rate_failed_deals < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_failed_deals }}</strong></td>
+            <td class="table-{% if rost_conversion_rate_ignored_failed_deals > 0 %}danger{% elif rost_conversion_rate_ignored_failed_deals < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_conversion_rate_ignored_failed_deals }}</strong></td>
           </tr>
           </tbody>
         </table>
@@ -367,13 +367,13 @@
             <td><strong>Период 1</strong></td>
             <td>{{ total_budget }}</td>
             <td>{{ total_revenue }}</td>
-            <td>{{ avg_cpa_lead|default:"Н/Д" }}</td>
-            <td>{{ avg_cpa_deal|default:"Н/Д" }}</td>
-            <td>{{ avg_cpa_won_deal|default:"Н/Д" }}</td>
-            <td>{{ revenue_per_qualified_deal|default:"Н/Д" }}</td>
-            <td>{{ direct_losses_ignored|default:"Н/Д" }}</td>
-            <td>{{ missed_profit|default:"Н/Д" }}</td>
-            <td>{{ roi|default:"Н/Д" }}</td>
+            <td>{{ avg_cpa_lead }}</td>
+            <td>{{ avg_cpa_deal }}</td>
+            <td>{{ avg_cpa_won_deal }}</td>
+            <td>{{ revenue_per_qualified_deal }}</td>
+            <td>{{ direct_losses_ignored }}</td>
+            <td>{{ missed_profit }}</td>
+            <td>{{ roi }}</td>
           </tr>
           <tr>
             <td><strong>Период 2</strong></td>
@@ -388,7 +388,7 @@
             <td>{{ roi2|default:"Н/Д" }}</td>
           </tr>
           <tr class="table-group-divider">
-            <td><strong>Итого за месяца</strong></td>
+            <td><strong>Итого за 2 периода</strong></td>
             <td><strong>{{ sum_total_budget }}</strong></td>
             <td><strong>{{ sum_total_revenue }}</strong></td>
             <td><strong>{{ sum_avg_cpa_lead|default:"Н/Д" }}</strong></td>

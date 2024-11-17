@@ -2119,8 +2119,13 @@ class ReportSrav(TemplateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
+        if not self.request.GET:
+            print('Нет гета')
+        else:
+            print('Есть гет')
+
         year = self.request.GET.getlist('year')
-        month = self.request.GET.getlist('month')
+        month = list(map(int, self.request.GET.getlist('month')))
         segment = self.request.GET.getlist('segment')
         site = self.request.GET.getlist('site')
 
@@ -2135,17 +2140,15 @@ class ReportSrav(TemplateView):
         if site:
             reports = reports.filter(site__in=site)
 
-        years = Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()
-        months = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month',
-                                                                                         flat=True).distinct().order_by(
-            'month')
+        years = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()))
+        months = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month', flat=True).distinct()
         segments = Report.objects.values_list('segment', flat=True).distinct()
         sites = Report.objects.values_list('site', flat=True).distinct()
 
         months = sorted([(m, MONTHS[m]) for m in months if m in MONTHS.keys()])
 
         year2 = self.request.GET.getlist('year2')
-        month2 = self.request.GET.getlist('month2')
+        month2 = list(map(int, self.request.GET.getlist('month2')))
         segment2 = self.request.GET.getlist('segment2')
         site2 = self.request.GET.getlist('site2')
 
@@ -2160,7 +2163,8 @@ class ReportSrav(TemplateView):
         if site2:
             reports2 = reports2.filter(site__in=site2)
 
-        years2 = Report.objects.annotate(year=ExtractYear('start_period')).values_list('year', flat=True).distinct()
+        years2 = list(map(str, Report.objects.annotate(year=ExtractYear('start_period')).values_list('year',
+                                                                                                    flat=True).distinct()))
         months2 = Report.objects.annotate(month=ExtractMonth('start_period')).values_list('month',
                                                                                           flat=True).distinct().order_by(
             'month')
@@ -2196,40 +2200,39 @@ class ReportSrav(TemplateView):
                                     'qualified_deals__sum'] or 0  # Сумма качественных сделок
         total_failed_deals = reports.aggregate(Sum('failed_deals'))[
                                  'failed_deals__sum'] or 0  # Сумма проваленных сделок
-        total_ignored_failed_deals = reports.aggregate(Sum('ignored_failed_deals'))[
-                                         'ignored_failed_deals__sum'] or 0  # Сумма некач. сделок игнор
+        total_ignored_failed_deals = reports.aggregate(Sum('ignored_failed_deals'))['ignored_failed_deals__sum'] or 0  # Сумма некач. сделок игнор
         total_revenue = reports.aggregate(Sum('revenue'))['revenue__sum'] or 0  # Сумма выручки
 
         # Вычисления для отображения
-        avg_cpa_lead = round(total_budget / total_leads, 2) if total_leads > 0 else None  # Общий CPA Лида
-        avg_cpa_deal = round(total_budget / total_deals, 2) if total_deals > 0 else None  # Общий CPA Сделки
+        avg_cpa_lead = round(total_budget / total_leads, 2) if total_leads > 0 else 0  # Общий CPA Лида
+        avg_cpa_deal = round(total_budget / total_deals, 2) if total_deals > 0 else 0  # Общий CPA Сделки
         avg_cpa_won_deal = round(total_budget / total_qualified_deals,
-                                 2) if total_deals > 0 else None  # Общий CPA Выигранной Сделки
-        roi = round((total_revenue - total_budget) / total_budget * 100, 2) if total_budget > 0 else None  # Общий РОЙ
+                                 2) if total_deals > 0 else 0  # Общий CPA Выигранной Сделки
+        roi = round((total_revenue - total_budget) / total_budget * 100, 2) if total_budget > 0 else 0  # Общий РОЙ
         conversion_rate_clicks_to_leads = round((total_leads / total_clicks * 100),
-                                                2) if total_clicks > 0 else None  # Общий CR% Кликов в Лиды
+                                                2) if total_clicks > 0 else 0  # Общий CR% Кликов в Лиды
         conversion_rate_leads_to_deals = round((total_deals / total_leads * 100),
-                                               2) if total_leads > 0 else None  # Общий CR% Лидов в Сделки
+                                               2) if total_leads > 0 else 0  # Общий CR% Лидов в Сделки
         direct_losses_ignored = round(total_ignored_failed_deals * (avg_cpa_deal or 0),
                                       2)  # Общий Потери прямые по причине игнора дел
 
         # Добавим дополнительные значения для шаблона с округлением
         revenue_per_qualified_deal = round(total_revenue / total_qualified_deals,
-                                           2) if total_qualified_deals > 0 else None  # Общий Средний чек
+                                           2) if total_qualified_deals > 0 else 0  # Общий Средний чек
         conversion_rate_unqualified = round((total_unqualified_leads / total_leads * 100),
-                                            2) if total_leads > 0 else None  # Общий CR% некач. Лидов
+                                            2) if total_leads > 0 else 0  # Общий CR% некач. Лидов
         conversion_rate_qualified_leds_to_deals = round((total_qualified_deals / total_leads * 100),
-                                                        2) if total_deals > 0 else None  # % Общий % конверсии Обращений в Сделку качественную
+                                                        2) if total_deals > 0 else 0  # % Общий % конверсии Обращений в Сделку качественную
         conversion_rate_qualified_deals = round((total_qualified_deals / total_deals * 100),
-                                                2) if total_deals > 0 else None  # % Общий конверсии в Сделку качественную (после стадии "Встреча")
+                                                2) if total_deals > 0 else 0  # % Общий конверсии в Сделку качественную (после стадии "Встреча")
         conversion_rate_failed_deals = round((total_failed_deals / total_deals * 100),
-                                             2) if total_deals > 0 else None  # Общий % провала Сделок
+                                             2) if total_deals > 0 else 0  # Общий % провала Сделок
         conversion_rate_ignored_failed_deals = round((total_ignored_failed_deals / total_deals * 100),
-                                                     2) if total_deals > 0 else None  # Общий % провала Сделок по причине игнор дел
+                                                     2) if total_deals > 0 else 0  # Общий % провала Сделок по причине игнор дел
 
         missed_profit = round(((total_ignored_failed_deals * conversion_rate_qualified_deals / 100) * (
             float(revenue_per_qualified_deal) if revenue_per_qualified_deal is not None else 0)),
-                              2) if total_deals > 0 else None  # Общий Упущенная прибыль
+                              2) if total_deals > 0 else 0  # Общий Упущенная прибыль
 
         # Средние показатели
 
@@ -2265,36 +2268,36 @@ class ReportSrav(TemplateView):
         total_revenue2 = reports2.aggregate(Sum('revenue'))['revenue__sum'] or 0  # Сумма выручки
 
         # Вычисления для отображения
-        avg_cpa_lead2 = round(total_budget2 / total_leads2, 2) if total_leads2 > 0 else None  # Общий CPA Лида
-        avg_cpa_deal2 = round(total_budget2 / total_deals2, 2) if total_deals2 > 0 else None  # Общий CPA Сделки
+        avg_cpa_lead2 = round(total_budget2 / total_leads2, 2) if total_leads2 > 0 else 0  # Общий CPA Лида
+        avg_cpa_deal2 = round(total_budget2 / total_deals2, 2) if total_deals2 > 0 else 0  # Общий CPA Сделки
         avg_cpa_won_deal2 = round(total_budget2 / total_qualified_deals2,
-                                  2) if total_deals2 > 0 else None  # Общий CPA Выигранной Сделки
+                                  2) if total_deals2 > 0 else 0  # Общий CPA Выигранной Сделки
         roi2 = round((total_revenue2 - total_budget2) / total_budget2 * 100,
-                     2) if total_budget2 > 0 else None  # Общий РОЙ
+                     2) if total_budget2 > 0 else 0  # Общий РОЙ
         conversion_rate_clicks_to_leads2 = round((total_leads2 / total_clicks2 * 100),
-                                                 2) if total_clicks2 > 0 else None  # Общий CR% Кликов в Лиды
+                                                 2) if total_clicks2 > 0 else 0  # Общий CR% Кликов в Лиды
         conversion_rate_leads_to_deals2 = round((total_deals2 / total_leads2 * 100),
-                                                2) if total_leads2 > 0 else None  # Общий CR% Лидов в Сделки
+                                                2) if total_leads2 > 0 else 0  # Общий CR% Лидов в Сделки
         direct_losses_ignored2 = round(total_ignored_failed_deals2 * (avg_cpa_deal2 or 0),
                                        2)  # Общий Потери прямые по причине игнора дел
 
         # Добавим дополнительные значения для шаблона с округлением
         revenue_per_qualified_deal2 = round(total_revenue2 / total_qualified_deals2,
-                                            2) if total_qualified_deals2 > 0 else None  # Общий Средний чек
+                                            2) if total_qualified_deals2 > 0 else 0  # Общий Средний чек
         conversion_rate_unqualified2 = round((total_unqualified_leads2 / total_leads2 * 100),
-                                             2) if total_leads2 > 0 else None  # Общий CR% некач. Лидов
+                                             2) if total_leads2 > 0 else 0  # Общий CR% некач. Лидов
         conversion_rate_qualified_leds_to_deals2 = round((total_qualified_deals2 / total_leads2 * 100),
-                                                         2) if total_deals2 > 0 else None  # % Общий % конверсии Обращений в Сделку качественную
+                                                         2) if total_deals2 > 0 else 0  # % Общий % конверсии Обращений в Сделку качественную
         conversion_rate_qualified_deals2 = round((total_qualified_deals2 / total_deals2 * 100),
-                                                 2) if total_deals2 > 0 else None  # % Общий конверсии в Сделку качественную (после стадии "Встреча")
+                                                 2) if total_deals2 > 0 else 0  # % Общий конверсии в Сделку качественную (после стадии "Встреча")
         conversion_rate_failed_deals2 = round((total_failed_deals2 / total_deals2 * 100),
-                                              2) if total_deals2 > 0 else None  # Общий % провала Сделок
+                                              2) if total_deals2 > 0 else 0  # Общий % провала Сделок
         conversion_rate_ignored_failed_deals2 = round((total_ignored_failed_deals2 / total_deals2 * 100),
-                                                      2) if total_deals2 > 0 else None  # Общий % провала Сделок по причине игнор дел
+                                                      2) if total_deals2 > 0 else 0  # Общий % провала Сделок по причине игнор дел
 
         missed_profit2 = round(((total_ignored_failed_deals2 * conversion_rate_qualified_deals2 / 100) * (
             float(revenue_per_qualified_deal2) if revenue_per_qualified_deal2 is not None else 0)),
-                               2) if total_deals2 > 0 else None  # Общий Упущенная прибыль
+                               2) if total_deals2 > 0 else 0  # Общий Упущенная прибыль
 
         # Для суммарного периода
         # суммарные показатели
@@ -2356,6 +2359,32 @@ class ReportSrav(TemplateView):
         avg_ignored_failed_deals = reports.aggregate(Avg('ignored_failed_deals'))[
                                        'ignored_failed_deals__avg'] or 0  # Среднее некач. сделок игнор
         avg_revenue = reports.aggregate(Avg('revenue'))['revenue__avg'] or 0  # Среднее выручки
+        try:
+            rost_total_qualified_deals = round((total_qualified_deals2 - total_qualified_deals) / total_qualified_deals * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_total_qualified_deals = 0
+        try:
+            rost_total_ignored_failed_deals = round((total_ignored_failed_deals2 - total_ignored_failed_deals) / total_ignored_failed_deals * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_total_ignored_failed_deals = total_ignored_failed_deals2
+        try:
+            rost_direct_losses_ignored = round(
+                (direct_losses_ignored2 - direct_losses_ignored) / direct_losses_ignored * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_direct_losses_ignored = direct_losses_ignored2
+        try:
+            rost_missed_profit = round((missed_profit2 - missed_profit) / missed_profit * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_missed_profit = missed_profit2
+        try:
+            rost_conversion_rate_ignored_failed_deals = round((conversion_rate_ignored_failed_deals2 - conversion_rate_ignored_failed_deals) / conversion_rate_ignored_failed_deals * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_conversion_rate_ignored_failed_deals = conversion_rate_ignored_failed_deals2
+        try:
+            rost_conversion_rate_failed_deals = round((conversion_rate_failed_deals2 - conversion_rate_failed_deals) / conversion_rate_failed_deals * 100, 2)
+        except (ZeroDivisionError, ValueError):
+            rost_conversion_rate_failed_deals = 0
+        print(rost_conversion_rate_failed_deals)
 
         context.update({
             'title': 'Отчет сравнение периодов ' + str(month) + ' ' + str(year) + ' ' + str(month2) + ' ' + str(year2),
@@ -2363,10 +2392,10 @@ class ReportSrav(TemplateView):
             # для периода 1
             'reports': reports,
             'years': years,
+            'year': year,
             'months': months,
             'segments': segments,
             'sites': sites,
-            'year': year,
             'month': month,
             'segment': segment,
             'site': site,
@@ -2445,34 +2474,29 @@ class ReportSrav(TemplateView):
 
             # Общие средние
 
-            'avg_total_budget': (total_budget + total_budget2) / 2,
-            'avg_total_clicks': (total_clicks + total_clicks2) / 2,
-            'avg_total_leads': (total_leads + total_leads2) / 2,
-            'avg_total_unqualified_leads': (total_unqualified_leads + total_unqualified_leads2) / 2,
-            'avg_total_deals': (total_deals + total_deals2) / 2,
-            'avg_total_qualified_deals': (total_qualified_deals + total_qualified_deals2) / 2,
-            'avg_total_failed_deals': (total_failed_deals + total_failed_deals2) / 2,
-            'avg_total_ignored_failed_deals': (total_ignored_failed_deals + total_ignored_failed_deals2) / 2,
-            'avg_total_revenue': (total_revenue + total_revenue2) / 2,
-            'avg_avg_cpa_lead': (avg_cpa_lead + avg_cpa_lead2) / 2,
-            'avg_avg_cpa_deal': (avg_cpa_deal + avg_cpa_deal2) / 2,
-            'avg_avg_cpa_won_deal': (avg_cpa_won_deal + avg_cpa_won_deal2) / 2,
-            'avg_roi': (roi + roi2) / 2,
-            'avg_conversion_rate_clicks_to_leads': (
-                                                       conversion_rate_clicks_to_leads + conversion_rate_clicks_to_leads2) / 2,
-            'avg_conversion_rate_leads_to_deals': (
-                                                      conversion_rate_leads_to_deals + conversion_rate_leads_to_deals2) / 2,
-            'avg_direct_losses_ignored': (direct_losses_ignored + direct_losses_ignored2) / 2,
-            'avg_missed_profit': (missed_profit + missed_profit2) / 2,
-            'avg_revenue_per_qualified_deal': (revenue_per_qualified_deal + revenue_per_qualified_deal2) / 2,
-            'avg_conversion_rate_unqualified': (conversion_rate_unqualified + conversion_rate_unqualified2) / 2,
-            'avg_conversion_rate_qualified_leds_to_deals': (
-                                                               conversion_rate_qualified_leds_to_deals + conversion_rate_qualified_leds_to_deals2) / 2,
-            'avg_conversion_rate_qualified_deals': (
-                                                       conversion_rate_qualified_deals + conversion_rate_qualified_deals2) / 2,
-            'avg_conversion_rate_failed_deals': (conversion_rate_failed_deals + conversion_rate_failed_deals2) / 2,
-            'avg_conversion_rate_ignored_failed_deals': (
-                                                            conversion_rate_ignored_failed_deals + conversion_rate_ignored_failed_deals2) / 2,
+            'avg_total_budget':  round((total_budget + total_budget2) / 2, 2),
+            'avg_total_clicks': round((total_clicks + total_clicks2) / 2, 2),
+            'avg_total_leads': round((total_leads + total_leads2) / 2, 2),
+            'avg_total_unqualified_leads': round((total_unqualified_leads + total_unqualified_leads2) / 2, 2),
+            'avg_total_deals': round((total_deals + total_deals2) / 2, 2),
+            'avg_total_qualified_deals': round((total_qualified_deals + total_qualified_deals2) / 2, 2),
+            'avg_total_failed_deals': round((total_failed_deals + total_failed_deals2) / 2, 2 ),
+            'avg_total_ignored_failed_deals': round((total_ignored_failed_deals + total_ignored_failed_deals2) / 2, 2),
+            'avg_total_revenue': round((total_revenue + total_revenue2) / 2, 2),
+            'avg_avg_cpa_lead': round((avg_cpa_lead + avg_cpa_lead2) / 2, 2),
+            'avg_avg_cpa_deal': round((avg_cpa_deal + avg_cpa_deal2) / 2, 2),
+            'avg_avg_cpa_won_deal': round((avg_cpa_won_deal + avg_cpa_won_deal2) / 2, 2),
+            'avg_roi': round((roi + roi2) / 2, 2),
+            'avg_conversion_rate_clicks_to_leads': round((conversion_rate_clicks_to_leads + conversion_rate_clicks_to_leads2) / 2, 2),
+            'avg_conversion_rate_leads_to_deals': round((conversion_rate_leads_to_deals + conversion_rate_leads_to_deals2) / 2, 2),
+            'avg_direct_losses_ignored': round((direct_losses_ignored + direct_losses_ignored2) / 2, 2),
+            'avg_missed_profit': round((missed_profit + missed_profit2) / 2, 2),
+            'avg_revenue_per_qualified_deal': round((revenue_per_qualified_deal + revenue_per_qualified_deal2) / 2, 2),
+            'avg_conversion_rate_unqualified': round((conversion_rate_unqualified + conversion_rate_unqualified2) / 2, 2),
+            'avg_conversion_rate_qualified_leds_to_deals':  round((conversion_rate_qualified_leds_to_deals + conversion_rate_qualified_leds_to_deals2) / 2, 2),
+            'avg_conversion_rate_qualified_deals': round((conversion_rate_qualified_deals + conversion_rate_qualified_deals2) / 2, 2),
+            'avg_conversion_rate_failed_deals': round((conversion_rate_failed_deals + conversion_rate_failed_deals2) / 2, 2),
+            'avg_conversion_rate_ignored_failed_deals': round((conversion_rate_ignored_failed_deals + conversion_rate_ignored_failed_deals2) / 2, 2),
 
             # Общяя сумма
 
@@ -2506,14 +2530,11 @@ class ReportSrav(TemplateView):
             'rost_total_budget': round((total_budget2 - total_budget) / total_budget * 100, 2),
             'rost_total_clicks': round((total_clicks2 - total_clicks) / total_clicks * 100, 2),
             'rost_total_leads': round((total_leads2 - total_leads) / total_leads * 100, 2),
-            'rost_total_unqualified_leads': round(
-                (total_unqualified_leads2 - total_unqualified_leads) / total_unqualified_leads * 100, 2),
+            'rost_total_unqualified_leads': round((total_unqualified_leads2 - total_unqualified_leads) / total_unqualified_leads * 100, 2),
             'rost_total_deals': round((total_deals2 - total_deals) / total_deals * 100, 2),
-            'rost_total_qualified_deals': round(
-                (total_qualified_deals2 - total_qualified_deals) / total_qualified_deals * 100, 2),
+            'rost_total_qualified_deals': rost_total_qualified_deals,
             'rost_total_failed_deals': round((total_failed_deals2 - total_failed_deals) / total_failed_deals * 100, 2),
-            'rost_total_ignored_failed_deals': round(
-                (total_ignored_failed_deals2 - total_ignored_failed_deals) / total_ignored_failed_deals * 100, 2),
+            'rost_total_ignored_failed_deals': rost_total_ignored_failed_deals,
             'rost_total_revenue': round((total_revenue2 - total_revenue) / total_revenue * 100, 2),
             'rost_avg_cpa_lead': round((avg_cpa_lead2 - avg_cpa_lead) / avg_cpa_lead * 100, 2),
             'rost_avg_cpa_deal': round((avg_cpa_deal2 - avg_cpa_deal) / avg_cpa_deal * 100, 2),
@@ -2525,9 +2546,8 @@ class ReportSrav(TemplateView):
             'rost_conversion_rate_leads_to_deals': round((
                                                              conversion_rate_leads_to_deals2 - conversion_rate_leads_to_deals) / conversion_rate_leads_to_deals * 100,
                                                          2),
-            'rost_direct_losses_ignored': round(
-                (direct_losses_ignored2 - direct_losses_ignored) / direct_losses_ignored * 100, 2),
-            'rost_missed_profit': round((missed_profit2 - missed_profit) / missed_profit * 100, 2),
+            'rost_direct_losses_ignored': rost_direct_losses_ignored,
+            'rost_missed_profit': rost_missed_profit,
             'rost_revenue_per_qualified_deal': round(
                 (revenue_per_qualified_deal2 - revenue_per_qualified_deal) / revenue_per_qualified_deal * 100, 2),
             'rost_conversion_rate_unqualified': round(
@@ -2538,12 +2558,8 @@ class ReportSrav(TemplateView):
             'rost_conversion_rate_qualified_deals': round((
                                                               conversion_rate_qualified_deals2 - conversion_rate_qualified_deals) / conversion_rate_qualified_deals * 100,
                                                           2),
-            'rost_conversion_rate_failed_deals': round(
-                (conversion_rate_failed_deals2 - conversion_rate_failed_deals) / conversion_rate_failed_deals * 100,
-                2),
-            'rost_conversion_rate_ignored_failed_deals': round((
-                                                                   conversion_rate_ignored_failed_deals2 - conversion_rate_ignored_failed_deals) / conversion_rate_ignored_failed_deals * 100,
-                                                               2),
+            'rost_conversion_rate_failed_deals': rost_conversion_rate_failed_deals,
+            'rost_conversion_rate_ignored_failed_deals': rost_conversion_rate_ignored_failed_deals,
         })
 
         return context
@@ -3099,7 +3115,7 @@ class ReportRus(TemplateView):
             'rost_total_deals': round((total_deals - total_deals2) / total_deals2 * 100, 2) if total_deals2 > 0 else 0,
             'rost_total_qualified_deals': round(
                 (total_qualified_deals - total_qualified_deals2) / total_qualified_deals2 * 100, 2) if total_qualified_deals2 > 0 else 0,
-            'rost_total_failed_deals': round((total_failed_deals - total_failed_deals2) / total_failed_deals2 * 100, 2) if total_failed_deals2 > 0 else 0,
+            'rost_total_failed_deals': round((total_failed_deals - total_failed_deals2) / total_failed_deals2 * 100, 2),
             'rost_total_ignored_failed_deals': round(
                 (total_ignored_failed_deals - total_ignored_failed_deals2) / total_ignored_failed_deals2 * 100, 2) if total_ignored_failed_deals2 > 0 else 0,
             'rost_total_revenue': round((total_revenue - total_revenue2) / total_revenue2 * 100, 2) if total_revenue2 > 0 else 0,
