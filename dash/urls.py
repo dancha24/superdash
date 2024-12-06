@@ -16,5 +16,5 @@ urlpatterns = [
     path("reports_srav/", views.ReportSrav.as_view(template_name="dash/rep_srav.html"), name="reports_srav",),
     path("report_obsh/", views.ReportObsh.as_view(template_name="dash/rep_obsh.html"), name="report_obsh",),
     path("report_rus/", views.ReportRus.as_view(template_name="dash/rep_rus.html"), name="report_rus",),
-    path("report_rus_period/", views.ReportPeriod.as_view(template_name="dash/rep_period.html"), name="report_period",),
+    # path("report_rus_period/", views.ReportPeriod.as_view(template_name="dash/rep_period.html"), name="report_period",),
 ]
