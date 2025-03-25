@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Transaction(models.Model):
     customer = models.CharField(max_length=150)
     transaction_date = models.DateField()

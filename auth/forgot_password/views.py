@@ -1,12 +1,14 @@
-from django.shortcuts import redirect
-from django.contrib.auth.models import User
-from django.contrib import messages
+import uuid
+from datetime import datetime, timedelta
+
 from django.conf import settings
+from django.contrib import messages
+from django.contrib.auth.models import User
+from django.shortcuts import redirect
+
 from auth.helpers import send_password_reset_email
 from auth.models import Profile  # Import the Profile model
 from auth.views import AuthView
-from datetime import timedelta, datetime
-import uuid
 
 
 class ForgetPasswordView(AuthView):
@@ -45,6 +47,5 @@ class ForgetPasswordView(AuthView):
                 messages.success(request, "A password reset email has been sent. Please check your inbox")
             else:
                 messages.error(request, "Email settings are not configured. Unable to send verification email.")
-
 
             return redirect("forgot-password")

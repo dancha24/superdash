@@ -1,11 +1,13 @@
-from django.shortcuts import render, redirect
 from django.contrib import messages
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect, render
+
 from auth.models import Profile
 from auth.views import AuthView
-from django.contrib.auth import authenticate, login
+
 
 class ResetPasswordView(AuthView):
-    def get(self, request,token):
+    def get(self, request, token):
         if request.user.is_authenticated:
             # If the user is already logged in, redirect them to the home page or another appropriate page.
             return redirect("index")  # Replace 'index' with the actual URL name for the home page

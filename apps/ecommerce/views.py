@@ -1,6 +1,6 @@
 from django.views.generic import TemplateView
-from web_project import TemplateLayout
 
+from web_project import TemplateLayout
 
 """
 This file is a view controller for multiple pages as a module.

@@ -1,5 +1,7 @@
 from django.contrib import admin
+
 from .models import Transaction
+
 
 # Register your models here.
 class TransactionAdmin(admin.ModelAdmin):
@@ -8,5 +10,6 @@ class TransactionAdmin(admin.ModelAdmin):
     search_fields = ('customer', 'transaction_date', 'due_date', 'total', 'status')
     ordering = ('customer', 'transaction_date', 'due_date', 'total', 'status')
     list_per_page = 10
+
 
 admin.site.register(Transaction, TransactionAdmin)

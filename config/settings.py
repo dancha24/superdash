@@ -244,7 +244,7 @@ LOGOUT_REDIRECT_URL = "/login/"
 # ------------------------------------------------------------------------------
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-SESSION_COOKIE_SECURE = True
+# SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 
@@ -256,7 +256,7 @@ SESSION_COOKIE_AGE = 3600
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 if not DEBUG:
-    CSRF_TRUSTED_ORIGINS = ['http://*.your-domain.ru', 'https://*.your-domain.ru'] # FIX admin CSRF token issue
+    CSRF_TRUSTED_ORIGINS = ['http://*.your-domain.ru', 'https://*.your-domain.ru']  # FIX admin CSRF token issue
 
 # Your stuff...
 # ------------------------------------------------------------------------------

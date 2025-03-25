@@ -1,7 +1,9 @@
 import csv
-from django.core.management.base import BaseCommand
-from dash.models import Report
 from datetime import datetime
+
+from django.core.management.base import BaseCommand
+
+from dash.models import Report
 
 
 class Command(BaseCommand):

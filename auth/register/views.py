@@ -1,11 +1,13 @@
-from django.shortcuts import redirect
-from django.contrib.auth.models import User, Group
-from django.contrib import messages
+import uuid
+
 from django.conf import settings
-from auth.views import AuthView
+from django.contrib import messages
+from django.contrib.auth.models import Group, User
+from django.shortcuts import redirect
+
 from auth.helpers import send_verification_email
 from auth.models import Profile
-import uuid
+from auth.views import AuthView
 
 
 class RegisterView(AuthView):
@@ -58,6 +60,6 @@ class RegisterView(AuthView):
         else:
             messages.error(request, "Email settings are not configured. Unable to send verification email.")
 
-        request.session['email'] = email ## Save email in session
+        request.session['email'] = email  # Save email in session
         # Redirect to the verification page after successful registration
         return redirect("verify-email-page")

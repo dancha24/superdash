@@ -1,9 +1,9 @@
-from django.views.generic import TemplateView
 from django.db.models import Sum
-from web_project.template_helpers.theme import TemplateHelper
-from web_project import TemplateLayout
-from apps.transactions.models import Transaction
+from django.views.generic import TemplateView
 
+from apps.transactions.models import Transaction
+from web_project import TemplateLayout
+from web_project.template_helpers.theme import TemplateHelper
 
 
 class TransactionListView(TemplateView):
@@ -27,15 +27,16 @@ class TransactionListView(TemplateView):
     def get_annotated_transactions(self):
         # Get all transactions and order them by ID
         return Transaction.objects.all().order_by('id')
+
     def get_total_due(self):
-            total_due_amount = Transaction.objects.filter(status='Due').aggregate(total_due=Sum('total'))
-            return float(total_due_amount['total_due']) if total_due_amount['total_due']  is not None else 0.0
+        total_due_amount = Transaction.objects.filter(status='Due').aggregate(total_due=Sum('total'))
+        return float(total_due_amount['total_due']) if total_due_amount['total_due'] is not None else 0.0
 
     def get_total_paid(self):
         # Calculate the total sum of 'total' field for 'Paid' transactions
         total_paid_amount = Transaction.objects.filter(status='Paid').aggregate(total_paid=Sum('total'))
-        return float(total_paid_amount['total_paid']) if total_paid_amount['total_paid']  is not None else 0.0
+        return float(total_paid_amount['total_paid']) if total_paid_amount['total_paid'] is not None else 0.0
 
     def get_total_canceled(self):
         total_canceled_amount = Transaction.objects.filter(status='Canceled').aggregate(total_canceled=Sum('total'))
-        return float(total_canceled_amount['total_canceled']) if total_canceled_amount['total_canceled']  is not None else 0.0
+        return float(total_canceled_amount['total_canceled']) if total_canceled_amount['total_canceled'] is not None else 0.0

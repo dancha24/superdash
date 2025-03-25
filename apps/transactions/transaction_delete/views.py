@@ -1,8 +1,10 @@
-from django.shortcuts import redirect, get_object_or_404
-from django.views.generic import DeleteView
 from django.contrib import messages
-from apps.transactions.models import Transaction
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import get_object_or_404, redirect
+from django.views.generic import DeleteView
+
+from apps.transactions.models import Transaction
+
 
 class TransactionDeleteView(PermissionRequiredMixin, DeleteView):
 

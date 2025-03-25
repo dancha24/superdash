@@ -1,11 +1,15 @@
 from datetime import date
-from django.shortcuts import redirect
+
 from django.contrib import messages
-from django.views.generic import TemplateView
-from web_project import TemplateLayout
-from apps.transactions.models import Transaction
-from apps.transactions.forms import TransactionForm
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import redirect
+from django.views.generic import TemplateView
+
+from apps.transactions.forms import TransactionForm
+from apps.transactions.models import Transaction
+from web_project import TemplateLayout
+
+
 class TransactionAddView(PermissionRequiredMixin, TemplateView):
     permission_required = ("transactions.add_transaction")
 

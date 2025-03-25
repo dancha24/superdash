@@ -1,7 +1,7 @@
-from django.urls import path
-from .views import eCommerceView
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
+from .views import eCommerceView
 
 urlpatterns = [
     path(
@@ -41,7 +41,7 @@ urlpatterns = [
     ),
     path(
         "app/ecommerce/customer/details/overview/",
-        login_required(eCommerceView.as_view(template_name="app_ecommerce_customer_details_overview.html" )),
+        login_required(eCommerceView.as_view(template_name="app_ecommerce_customer_details_overview.html")),
         name="app-ecommerce-customer-details-overview",
     ),
     path(
@@ -56,7 +56,7 @@ urlpatterns = [
     ),
     path(
         "app/ecommerce/customer/details/notifications/",
-        login_required(eCommerceView.as_view(template_name="app_ecommerce_customer_details_notifications.html" )),
+        login_required(eCommerceView.as_view(template_name="app_ecommerce_customer_details_notifications.html")),
         name="app-ecommerce-customer-details-notifications",
     ),
     path(

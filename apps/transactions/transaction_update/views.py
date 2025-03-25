@@ -1,11 +1,13 @@
-from django.shortcuts import redirect
 from django.contrib import messages
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Q
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
-from web_project import TemplateLayout
+
 from apps.transactions.forms import TransactionForm
 from apps.transactions.models import Transaction
-from django.contrib.auth.mixins import PermissionRequiredMixin
+from web_project import TemplateLayout
+
 
 class TransactionUpdateView(PermissionRequiredMixin, TemplateView):
     permission_required = ("transactions.update_transaction")
@@ -33,10 +35,16 @@ class TransactionUpdateView(PermissionRequiredMixin, TemplateView):
 
     def transaction_exists(self, cleaned_data, current_transaction):
         matching_transactions = Transaction.objects.filter(
-            Q(customer__iexact=cleaned_data['customer']) &
-            Q(transaction_date=cleaned_data['transaction_date']) &
-            Q(due_date=cleaned_data['due_date']) &
-            Q(total=cleaned_data['total']) &
-            Q(status=cleaned_data['status'])
+            Q(
+                customer__iexact=cleaned_data['customer']
+            ) & Q(
+                transaction_date=cleaned_data['transaction_date']
+            ) & Q(
+                due_date=cleaned_data['due_date']
+            ) & Q(
+                total=cleaned_data['total']
+            ) & Q(
+                status=cleaned_data['status']
+            )
         ).exclude(pk=current_transaction.pk)
         return matching_transactions.exists()

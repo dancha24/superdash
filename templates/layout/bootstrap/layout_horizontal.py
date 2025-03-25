@@ -1,10 +1,10 @@
-from django.conf import settings
 import json
 
+from django.conf import settings
 
 from web_project.template_helpers.theme import TemplateHelper
 
-menu_file_path =  settings.BASE_DIR / "templates" / "layout" / "partials" / "menu" / "horizontal" / "json" / "horizontal_menu.json"
+menu_file_path = settings.BASE_DIR / "templates" / "layout" / "partials" / "menu" / "horizontal" / "json" / "horizontal_menu.json"
 
 
 """
@@ -34,10 +34,9 @@ class TemplateBootstrapLayoutHorizontal:
 
         return context
 
-
     def init_menu_data(context):
         # Load the menu data from the JSON file
         menu_data = json.load(menu_file_path.open()) if menu_file_path.exists() else []
 
         # Updated context with menu_data
-        context.update({ "menu_data": menu_data })
+        context.update({"menu_data": menu_data})

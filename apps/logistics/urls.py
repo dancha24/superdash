@@ -1,7 +1,7 @@
-from django.urls import path
-from .views import LogisticsView
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
+from .views import LogisticsView
 
 urlpatterns = [
     path(

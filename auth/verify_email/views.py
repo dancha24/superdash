@@ -1,11 +1,12 @@
-from django.shortcuts import redirect
-from django.contrib import messages
-from django.conf import settings
-from auth.views import AuthView
-from auth.models import Profile
-from auth.helpers import send_verification_email
 import uuid
 
+from django.conf import settings
+from django.contrib import messages
+from django.shortcuts import redirect
+
+from auth.helpers import send_verification_email
+from auth.models import Profile
+from auth.views import AuthView
 
 
 class VerifyEmailTokenView(AuthView):
@@ -25,6 +26,7 @@ class VerifyEmailTokenView(AuthView):
         except Profile.DoesNotExist:
             messages.error(request, "Invalid token, please try again")
             return redirect("verify-email-page")
+
 
 class VerifyEmailView(AuthView):
     def get(self, request):
@@ -61,6 +63,6 @@ class SendVerificationView(AuthView):
             if settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD:
                 message = "Resend verification email successfully" if email else None
             else:
-                 message = messages.error(request, "Email settings are not configured. Unable to send verification email.")
+                message = messages.error(request, "Email settings are not configured. Unable to send verification email.")
 
         return email, message

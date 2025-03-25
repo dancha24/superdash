@@ -1,6 +1,7 @@
+from django.conf import settings
 from django.core.mail import EmailMessage
 from django.urls import reverse
-from django.conf import settings
+
 
 def send_email(subject, email, message):
     try:
@@ -15,11 +16,13 @@ def send_email(subject, email, message):
 def get_absolute_url(path):
     return settings.BASE_URL + path
 
+
 def send_verification_email(email, token):
     subject = "Verify your email"
     verification_url = get_absolute_url(reverse('verify-email', kwargs={'token': token}))
     message = f"Hi,\n\nPlease verify your email using this link: {verification_url}"
     send_email(subject, email, message)
+
 
 def send_password_reset_email(email, token):
     subject = "Reset your password"

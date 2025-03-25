@@ -1,7 +1,7 @@
-from django.urls import path
-from .views import FormWizardView
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
+from .views import FormWizardView
 
 urlpatterns = [
     path(

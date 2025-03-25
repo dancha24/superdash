@@ -1,17 +1,9 @@
-from django.urls import path
-from .views import (
-    CollapsedMenuView,
-    ContentNavSidebarView,
-    VerticalView,
-    HorizontalView,
-    WithoutMenuView,
-    WithoutNavView,
-    FluidView,
-    ContainerView,
-    BlankView,
-)
 from django.contrib.auth.decorators import login_required
+from django.urls import path
 
+from .views import (
+    BlankView, CollapsedMenuView, ContainerView, ContentNavSidebarView, FluidView, HorizontalView, VerticalView,
+    WithoutMenuView, WithoutNavView)
 
 urlpatterns = [
     path(

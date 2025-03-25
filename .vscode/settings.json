@@ -81,4 +81,5 @@
   "eslint.format.enable": true,
   // Extension: npm
   "npm.packageManager": "yarn",
+  "gitflow.disableOnRepo": true,
 }
