@@ -17,5 +17,7 @@ COPY . ${APP_HOME}
 # running migrations
 RUN python manage.py migrate
 
+EXPOSE 5005
+
 # gunicorn
 CMD ["gunicorn", "--config", "gunicorn-cfg.py", "config.wsgi"]
