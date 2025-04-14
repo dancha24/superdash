@@ -35,7 +35,7 @@ DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = ["xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai", "кабинет.методика1.рф"]
 
 # Current DJANGO_ENVIRONMENT
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
