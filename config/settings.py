@@ -35,7 +35,7 @@ DEBUG = os.environ.get("DEBUG", 'True').lower() in ['true', 'yes', '1']
 
 
 # https://docs.djangoproject.com/en/dev/ref/settings/#allowed-hosts
-ALLOWED_HOSTS = ["xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai", "кабинет.методика1.рф"]
+ALLOWED_HOSTS = ["*"]
 
 # Current DJANGO_ENVIRONMENT
 ENVIRONMENT = os.environ.get("DJANGO_ENVIRONMENT", default="local")
@@ -253,18 +253,16 @@ SESSION_COOKIE_AGE = 3600
 # CSRF_TRUSTED_ORIGINS = [
 #     "http://localhost:5050",
 # ]
-# if DEBUG:
-#     CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
-# if not DEBUG:
-#     CSRF_TRUSTED_ORIGINS = [
-#         'http://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
-#         'https://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
-#         'http://кабинет.методика1.рф',
-#         'https://кабинет.методика1.рф'
-#     ]  # FIX admin CSRF token issue
+if DEBUG:
+    CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
+if not DEBUG:
+    CSRF_TRUSTED_ORIGINS = [
+        'http://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
+        'https://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
+        'http://кабинет.методика1.рф',
+        'https://кабинет.методика1.рф'
+    ]  # FIX admin CSRF token issue
 
-
-CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 
 # Your stuff...
 # ------------------------------------------------------------------------------
