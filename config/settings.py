@@ -256,7 +256,12 @@ SESSION_COOKIE_AGE = 3600
 if DEBUG:
     CSRF_TRUSTED_ORIGINS = ['http://*', 'https://*']
 if not DEBUG:
-    CSRF_TRUSTED_ORIGINS = ['http://*.your-domain.ru', 'https://*.your-domain.ru']  # FIX admin CSRF token issue
+    CSRF_TRUSTED_ORIGINS = [
+        'http://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
+        'https://xn--80acmlhv0b.xn--1-7sbldqmkr9a.xn--p1ai',
+        'http://кабинет.методика1.рф',
+        'https://кабинет.методика1.рф'
+    ]  # FIX admin CSRF token issue
 
 # Your stuff...
 # ------------------------------------------------------------------------------
