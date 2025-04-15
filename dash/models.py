@@ -4,8 +4,8 @@ from functools import cache
 
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Avg, Sum
-from django.db.models.functions import ExtractMonth, ExtractYear
+from django.db.models import Avg, Case, F, Sum, Value, When
+from django.db.models.functions import ExtractMonth, ExtractYear, Round
 
 MONTHS = {
     1: "Январь",
@@ -23,6 +23,91 @@ MONTHS = {
 }
 
 
+class ReportManager(models.Manager):
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        base_qs = base_qs.annotate(
+            # CR% Кликов в Лиды
+            cr_clicks_to_leads=Case(
+                When(clicks__gt=0, then=Round(F("leads") * Value(100.0) / F("clicks"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # CR% Лидов в Сделки
+            cr_leads_to_deals=Case(
+                When(leads__gt=0, then=Round(F("deals") * Value(100.0) / F("leads"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # CR% некач. Лидов
+            cr_non_quality=Case(
+                When(leads__gt=0, then=Round(F("unqualified_leads") * Value(100.0) / F("leads"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # % конверсии Обращений в Сделку качественную
+            conversion_leads_to_quality=Case(
+                When(leads__gt=0, then=Round(F("qualified_deals") * Value(100.0) / F("leads"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # % конверсии Обращений в Сделку качественную
+            conversion_meetings_to_quality=Case(
+                When(deals__gt=0, then=Round(F("qualified_deals") * Value(100.0) / F("deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # % провала Сделок
+            deals_failure_rate=Case(
+                When(deals__gt=0, then=Round(F("failed_deals") * Value(100.0) / F("deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # % провала Сделок по причине игнор дел
+            deals_failure_due_to_ignored=Case(
+                When(deals__gt=0, then=Round(F("ignored_failed_deals") * Value(100.0) / F("deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # CPA Лид
+            cpa_lead=Case(
+                When(leads__gt=0, then=Round(F("budget") / F("leads"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # CPA Сделка
+            cpa_deal=Case(
+                When(deals__gt=0, then=Round(F("budget") / F("deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # CPA выигранной Сделки
+            cpa_won=Case(
+                When(qualified_deals__gt=0, then=Round(F("budget") / F("qualified_deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # Средний чек
+            avg_check=Case(
+                When(qualified_deals__gt=0, then=Round(F("revenue") / F("qualified_deals"), 2)),
+                output_field=models.DecimalField(),
+            ),
+            # Потери прямые по причине игнора дел
+            direct_losses_ignored=Case(
+                When(ignored_failed_deals__gt=0, then=Round(F("ignored_failed_deals") * F("cpa_deal"), 2)),
+                default=Value(0.0),
+                output_field=models.DecimalField(),
+            ),
+            # Упущенная прибыль
+            missed_profit=Case(
+                When(ignored_failed_deals__gt=0, then=Round(
+                    F("ignored_failed_deals") * F("conversion_meetings_to_quality") / Value(100.0, output_field=models.DecimalField()) * F("avg_check"), 2
+                )),
+                default=Value(0.0),
+                output_field=models.DecimalField(),
+            ),
+            # ROI
+            roi=Case(
+                When(budget__gt=0, then=Round(
+                    (F("revenue") - F("budget")) * Value(100.0, output_field=models.DecimalField()) / F("budget"), 2
+                )),
+                output_field=models.DecimalField(),
+            ),
+
+        )
+        return base_qs
+
+
 class Report(models.Model):
     start_period = models.DateField("Начало периода")
     end_period = models.DateField("Конец периода")
@@ -37,6 +122,8 @@ class Report(models.Model):
     failed_deals = models.IntegerField("Кол-во проваленных Сделок")
     ignored_failed_deals = models.IntegerField("Кол-во проваленных Сделок по причине игнор дел")
     revenue = models.DecimalField("Выручка", max_digits=14, decimal_places=2)
+
+    objects = ReportManager()
 
     def clean(self):
         if any(
@@ -54,76 +141,6 @@ class Report(models.Model):
 
     def __str__(self):
         return f"{self.site} - {self.segment} ({self.start_period} - {self.end_period})"
-
-    # CR% Кликов в Лиды
-    @property
-    def cr_clicks_to_leads(self) -> float:
-        return round((self.leads / self.clicks * 100), 2) if self.clicks > 0 else None
-
-    # CR% Лидов в Сделки
-    @property
-    def cr_leads_to_deals(self) -> float:
-        return round((self.deals / self.leads * 100), 2) if self.leads > 0 else None
-
-    # CR% некач. Лидов
-    @property
-    def cr_non_quality(self) -> float:
-        return round((self.unqualified_leads / self.leads * 100), 2) if self.leads > 0 else None
-
-    # % конверсии Обращений в Сделку качественную
-    @property
-    def conversion_leads_to_quality(self) -> float:
-        return round((self.qualified_deals / self.leads * 100), 2) if self.leads > 0 else None
-
-    # % конверсии в Сделку качественную (после стадии "Встреча")
-    @property
-    def conversion_meetings_to_quality(self) -> float:
-        return round((self.qualified_deals / self.deals * 100), 2) if self.deals > 0 else None
-
-    # % провала Сделок
-    @property
-    def deals_failure_rate(self) -> float:
-        return round((self.failed_deals / self.deals * 100), 2) if self.deals > 0 else None
-
-    # % провала Сделок по причине игнор дел
-    @property
-    def deals_failure_due_to_ignored(self) -> float:
-        return round((self.ignored_failed_deals / self.deals * 100), 2) if self.deals > 0 else None
-
-    # CPA Лид
-    @property
-    def cpa_lead(self) -> float:
-        return round(float(self.budget) / self.leads, 2) if self.leads > 0 else None
-
-    # CPA Сделка
-    @property
-    def cpa_deal(self) -> float:
-        return round(float(self.budget) / self.deals, 2) if self.deals > 0 else None
-
-    # CPA выигранной Сделки
-    @property
-    def cpa_won(self) -> float:
-        return round(float(self.budget) / self.qualified_deals, 2) if self.qualified_deals > 0 else None
-
-    # Средний чек
-    @property
-    def avg_check(self) -> float:
-        return round(float(self.revenue) / self.qualified_deals, 2) if self.qualified_deals > 0 else None
-
-    # Потери прямые по причине игнора дел
-    @property
-    def direct_losses_ignored(self) -> float:
-        return round(self.ignored_failed_deals * self.cpa_deal, 2) if self.ignored_failed_deals > 0 else 0
-
-    # Упущенная прибыль
-    @property
-    def missed_profit(self) -> float:
-        return round((self.ignored_failed_deals * self.conversion_meetings_to_quality / 100) * (self.avg_check or 0), 2) if self.ignored_failed_deals > 0 else 0
-
-    # РОЙ
-    @property
-    def roi(self) -> float:
-        return round((float(self.revenue) - float(self.budget)) / float(self.budget) * 100, 2) if self.budget > 0 else None
 
     @classmethod
     def total_sum_column(cls, name, queryset=None):
@@ -201,7 +218,7 @@ class Report(models.Model):
     @classmethod
     def get_value_field(cls, data_type, field_name, **params):
         _reports = cls.get_reports_by_params(**params)
-        if data_type == 'avg':
+        if data_type in ('avg', 'all_periods_avg'):
             value = _reports.aggregate(Avg(field_name))[f'{field_name}__avg'] or 0
         elif data_type == 'total':
             value = _reports.aggregate(Sum(field_name))[f'{field_name}__sum'] or 0
@@ -245,7 +262,7 @@ class Report(models.Model):
 
     @classmethod
     def get_data_by_type(cls, data_type: str, **params):
-        data_type_list = ('avg', 'total')
+        data_type_list = ('avg', 'total', 'all_periods_avg')
         if data_type not in data_type_list:
             raise ValueError(f'Invalid data type. Must be in list ({", ".join(data_type_list)})')
         data = defaultdict(lambda: Decimal(0.0))
@@ -258,16 +275,33 @@ class Report(models.Model):
             'qualified_deals',
             'failed_deals',
             'ignored_failed_deals',
-            'revenue'
+            'revenue',
+            'cr_clicks_to_leads',
+            'cr_leads_to_deals',
+            'cr_non_quality',
+            'conversion_leads_to_quality',
+            'conversion_meetings_to_quality',
+            'deals_failure_rate',
+            'deals_failure_due_to_ignored',
+            'cpa_lead',
+            'cpa_deal',
+            'cpa_won',
+            'avg_check',
+            'direct_losses_ignored',
+            'missed_profit',
+            'roi'
         ):
-            method_name = f'get_{field}'
-            method = getattr(Report, method_name)
-            data[f'{data_type}_{field}'] = method(data_type, **params)
+            data[f'{data_type}_{field}'] = cls.get_value_field(data_type, field, **params)
         return data
 
     @classmethod
     def get_avg_data(cls, **params):
         avg_data = cls.get_data_by_type('avg', **params)
+        return avg_data
+
+    @classmethod
+    def get_all_periods_avg_data(cls, **params):
+        avg_data = cls.get_data_by_type('all_periods_avg', **{})
         return avg_data
 
     @classmethod

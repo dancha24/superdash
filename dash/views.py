@@ -141,9 +141,9 @@ class ReportRus(TemplateView):
         if not month:
             if datetime.now().month == 1:
                 month.append(12)
-                year.append(datetime.now().year - 1)
+                year.append(str(datetime.now().year - 1))
             else:
-                year.append(datetime.now().year)
+                year.append(str(datetime.now().year))
                 month.append(datetime.now().month - 1)
 
         year, month = tuple(year), tuple(month)
@@ -159,10 +159,10 @@ class ReportRus(TemplateView):
 
         # Вычисляем предыдущий месяц
         if current_month == 1:
-            year2.append(current_year - 1)
+            year2.append(str(current_year - 1))
             month2.append(12)
         else:
-            year2.append(current_year)
+            year2.append(str(current_year))
             month2.append(current_month - 1)
 
         year2, month2 = tuple(year2), tuple(month2)

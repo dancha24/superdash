@@ -7,12 +7,12 @@ WORKDIR ${APP_HOME}
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-COPY requirements.txt ${APP_HOME}
-# install python dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
-
 COPY . ${APP_HOME}
+# install python dependencies
+RUN  pip install --upgrade pip \
+  && pip install poetry \
+  && poetry config virtualenvs.create false \
+  && poetry install --without dev --no-interaction --no-ansi
 
 # running migrations
 RUN python manage.py migrate

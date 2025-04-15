@@ -30,7 +30,10 @@
         "--nothreading"
       ],
       "django": true,
-      "justMyCode": false
+      "justMyCode": false,
+      "env": {
+        "LINE_PROFILE": "1",
+      }
     },
     {
       "name": "Python: Current File (External Terminal)",
