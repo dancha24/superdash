@@ -1,6 +1,8 @@
 from collections import defaultdict
 from decimal import Decimal
 from functools import cache
+from itertools import groupby
+from statistics import mean
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -213,13 +215,20 @@ class Report(models.Model):
                 else:
                     _field = f'{field_name}__in'
                 _reports = _reports.filter(**{_field: params[field_name]})
-        return _reports
+        return _reports  # .order_by('start_period', 'end_period')
 
     @classmethod
     def get_value_field(cls, data_type, field_name, **params):
         _reports = cls.get_reports_by_params(**params)
-        if data_type in ('avg', 'all_periods_avg'):
+        if data_type == 'avg':
             value = _reports.aggregate(Avg(field_name))[f'{field_name}__avg'] or 0
+        elif data_type == 'all_periods_avg':
+            periods_data = defaultdict(lambda: Decimal(0.0))
+            qs = _reports.defer('site', 'segment')
+            for key_period, grouped_data in groupby(qs, key=lambda x: (x.start_period, x.end_period)):
+                period_sum = sum(getattr(_report, field_name) for _report in grouped_data if getattr(_report, field_name) is not None)
+                periods_data[key_period] += period_sum
+            value = mean(periods_data.values())
         elif data_type == 'total':
             value = _reports.aggregate(Sum(field_name))[f'{field_name}__sum'] or 0
         return round(Decimal(value), 2)

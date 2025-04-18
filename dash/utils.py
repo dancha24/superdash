@@ -44,7 +44,7 @@ def print_all_reports():
 
 
 def get_report_data(year, month, segment=None, site=None):
-    if settings.DEBUG:
+    if settings.PRINT_ALL_REPORTS:
         print_all_reports()
     if segment is None:
         segment = list()
@@ -94,7 +94,7 @@ def get_report_data_by_two_periods(
     period1: List[List],
     period2: List[List]
 ):
-    if settings.DEBUG:
+    if settings.PRINT_ALL_REPORTS:
         print_all_reports()
     year, month, segment, site = period1
     year2, month2, segment2, site2 = period2
