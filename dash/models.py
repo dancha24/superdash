@@ -1,3 +1,4 @@
+import datetime
 from collections import defaultdict
 from decimal import Decimal
 from functools import cache
@@ -40,7 +41,7 @@ class ReportManager(models.Manager):
                 output_field=models.DecimalField(),
             ),
             # CR% некач. Лидов
-            cr_non_quality=Case(
+            cr_unqualified_leads=Case(
                 When(leads__gt=0, then=Round(F("unqualified_leads") * Value(100.0) / F("leads"), 2)),
                 output_field=models.DecimalField(),
             ),
@@ -126,6 +127,23 @@ class Report(models.Model):
     revenue = models.DecimalField("Выручка", max_digits=14, decimal_places=2)
 
     objects = ReportManager()
+
+    evaluated_fields = (
+        'cr_clicks_to_leads',
+        'cr_leads_to_deals',
+        'cr_unqualified_leads',
+        'conversion_leads_to_quality',
+        'conversion_meetings_to_quality',
+        'deals_failure_rate',
+        'deals_failure_due_to_ignored',
+        'cpa_lead',
+        'cpa_deal',
+        'cpa_won',
+        'avg_check',
+        'direct_losses_ignored',
+        'missed_profit',
+        'roi'
+    )
 
     def clean(self):
         if any(
@@ -220,6 +238,12 @@ class Report(models.Model):
     @classmethod
     def get_value_field(cls, data_type, field_name, **params):
         _reports = cls.get_reports_by_params(**params)
+        if field_name == 'failed_deals':
+            _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=12, year=2023))
+        elif field_name == 'ignored_failed_deals':
+            _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=3, year=2024))
+        elif field_name == 'revenue':
+            _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=5, year=2023))
         if data_type == 'avg':
             value = _reports.aggregate(Avg(field_name))[f'{field_name}__avg'] or 0
         elif data_type == 'all_periods_avg':
@@ -285,20 +309,6 @@ class Report(models.Model):
             'failed_deals',
             'ignored_failed_deals',
             'revenue',
-            'cr_clicks_to_leads',
-            'cr_leads_to_deals',
-            'cr_non_quality',
-            'conversion_leads_to_quality',
-            'conversion_meetings_to_quality',
-            'deals_failure_rate',
-            'deals_failure_due_to_ignored',
-            'cpa_lead',
-            'cpa_deal',
-            'cpa_won',
-            'avg_check',
-            'direct_losses_ignored',
-            'missed_profit',
-            'roi'
         ):
             data[f'{data_type}_{field}'] = cls.get_value_field(data_type, field, **params)
         return data
@@ -310,7 +320,27 @@ class Report(models.Model):
 
     @classmethod
     def get_all_periods_avg_data(cls, **params):
-        avg_data = cls.get_data_by_type('all_periods_avg', **{})
+        prefix = 'all_periods_avg'
+        field_evaluate_formula = {
+            'cr_clicks_to_leads': lambda x: round(x['all_periods_avg_leads'] / x['all_periods_avg_clicks'] * 100, 2),
+            'cr_leads_to_deals': lambda x: round(x['all_periods_avg_deals'] / x['all_periods_avg_leads'] * 100, 2),
+            'cr_unqualified_leads': lambda x: round(x['all_periods_avg_unqualified_leads'] / x['all_periods_avg_leads'] * 100, 2),
+            'conversion_leads_to_quality': lambda x: round(x['all_periods_avg_qualified_deals'] / x['all_periods_avg_leads'] * 100, 2),
+            'conversion_meetings_to_quality': lambda x: round(x['all_periods_avg_qualified_deals'] / x['all_periods_avg_deals'] * 100, 2),
+            'deals_failure_rate': lambda x: round(x['all_periods_avg_failed_deals'] / x['all_periods_avg_deals'] * 100, 2),
+            'deals_failure_due_to_ignored': lambda x: round(x['all_periods_avg_ignored_failed_deals'] / x['all_periods_avg_deals'] * 100, 2),
+            'cpa_lead': lambda x: round(x['all_periods_avg_budget'] / x['all_periods_avg_leads'], 2),
+            'cpa_deal': lambda x: round(x['all_periods_avg_budget'] / x['all_periods_avg_deals'], 2),
+            'cpa_won': lambda x: round(x['all_periods_avg_budget'] / x['all_periods_avg_qualified_deals'], 2),
+            'avg_check': lambda x: round(x['all_periods_avg_revenue'] / x['all_periods_avg_qualified_deals'], 2),
+            'roi': lambda x: round((x['all_periods_avg_revenue'] - x['all_periods_avg_budget']) / x['all_periods_avg_budget'] * 100, 2)
+        }
+        avg_data = cls.get_data_by_type(prefix, **{})
+        for evaluated_field in cls.evaluated_fields:
+            if evaluated_field in field_evaluate_formula.keys():
+                avg_data[f'{prefix}_{evaluated_field}'] = field_evaluate_formula[evaluated_field](avg_data)
+        avg_data[f'{prefix}_direct_losses_ignored'] = round(avg_data['all_periods_avg_ignored_failed_deals'] * avg_data[f'{prefix}_cpa_deal'], 2)
+        avg_data[f'{prefix}_missed_profit'] = round(avg_data['all_periods_avg_ignored_failed_deals'] * avg_data[f'{prefix}_conversion_meetings_to_quality'] * avg_data[f'{prefix}_avg_check'] / 100, 2)
         return avg_data
 
     @classmethod

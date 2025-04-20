@@ -26,7 +26,7 @@ def print_all_reports():
         'revenue',
         'cr_clicks_to_leads',
         'cr_leads_to_deals',
-        'cr_non_quality',
+        'cr_unqualified_leads',
         'conversion_leads_to_quality',
         'conversion_meetings_to_quality',
         'deals_failure_rate',
@@ -186,7 +186,7 @@ def get_report_data_by_two_periods(
         rost_total_qualified_deals = 0
 
     try:
-        rost_total_qualified_deals_2 = round((total_data_2['total_qualified_deals'] - all_periods_avg['all_periods_avg_qualified_deals']) / all_periods_avg['all_periods_avg_qualified_deals'], 2)
+        rost_total_qualified_deals_2 = round((total_data_2['total_qualified_deals'] - all_periods_avg['all_periods_avg_qualified_deals']) / all_periods_avg['all_periods_avg_qualified_deals'] * 100, 2)
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_total_qualified_deals_2 = 0
 
@@ -196,7 +196,7 @@ def get_report_data_by_two_periods(
         rost_total_ignored_failed_deals = total_data_2['total_ignored_failed_deals']
 
     try:
-        rost_total_ignored_failed_deals_2 = round((total_data_2['total_ignored_failed_deals'] - all_periods_avg['all_periods_avg_ignored_failed_deals']) / all_periods_avg['all_periods_avg_ignored_failed_deals'], 2)
+        rost_total_ignored_failed_deals_2 = round((total_data_2['total_ignored_failed_deals'] - all_periods_avg['all_periods_avg_ignored_failed_deals']) / all_periods_avg['all_periods_avg_ignored_failed_deals'] * 100, 2)
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_total_ignored_failed_deals_2 = total_data_2['total_ignored_failed_deals']
 
@@ -209,7 +209,7 @@ def get_report_data_by_two_periods(
 
     try:
         rost_direct_losses_ignored_2 = round(
-            (presentation_data_2['direct_losses_ignored'] - all_periods_avg['all_periods_avg_direct_losses_ignored_2']) / all_periods_avg['all_periods_avg_direct_losses_ignored_2'], 2
+            (presentation_data_2['direct_losses_ignored'] - all_periods_avg['all_periods_avg_direct_losses_ignored']) / all_periods_avg['all_periods_avg_direct_losses_ignored'] * 100, 2
         )
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_direct_losses_ignored_2 = presentation_data_2['direct_losses_ignored']
@@ -220,7 +220,7 @@ def get_report_data_by_two_periods(
         rost_missed_profit = additional_data_2['missed_profit']
 
     try:
-        rost_missed_profit_2 = round((additional_data_2['missed_profit'] - all_periods_avg['all_periods_avg_missed_profit']) / all_periods_avg['all_periods_avg_missed_profit'], 2)
+        rost_missed_profit_2 = round((additional_data_2['missed_profit'] - all_periods_avg['all_periods_avg_missed_profit']) / all_periods_avg['all_periods_avg_missed_profit'] * 100, 2)
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_missed_profit_2 = additional_data_2['missed_profit']
 
@@ -230,7 +230,7 @@ def get_report_data_by_two_periods(
         rost_conversion_rate_ignored_failed_deals = additional_data_2['conversion_rate_ignored_failed_deals']
 
     try:
-        rost_conversion_rate_ignored_failed_deals_2 = round((additional_data_2['conversion_rate_ignored_failed_deals'] - all_periods_avg['all_periods_avg_ignored_failed_deals']) / all_periods_avg['all_periods_avg_ignored_failed_deals'], 2)
+        rost_conversion_rate_ignored_failed_deals_2 = round((additional_data_2['conversion_rate_ignored_failed_deals'] - all_periods_avg['all_periods_avg_deals_failure_due_to_ignored']) / all_periods_avg['all_periods_avg_deals_failure_due_to_ignored'] * 100, 2)
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_conversion_rate_ignored_failed_deals_2 = additional_data_2['conversion_rate_ignored_failed_deals']
 
@@ -240,7 +240,7 @@ def get_report_data_by_two_periods(
         rost_conversion_rate_failed_deals = 0
 
     try:
-        rost_conversion_rate_failed_deals_2 = round((additional_data_2['conversion_rate_failed_deals'] - all_periods_avg['all_periods_avg_failed_deals']) / all_periods_avg['all_periods_avg_failed_deals'], 2)
+        rost_conversion_rate_failed_deals_2 = round((additional_data_2['conversion_rate_failed_deals'] - all_periods_avg['all_periods_avg_deals_failure_rate']) / all_periods_avg['all_periods_avg_deals_failure_rate'] * 100, 2)
     except (ZeroDivisionError, ValueError, DivisionUndefined, DivisionByZero, InvalidOperation):
         rost_conversion_rate_failed_deals_2 = 0
 
@@ -368,41 +368,41 @@ def get_report_data_by_two_periods(
         **all_periods_avg,
 
         # Изменения от общих средних
-        'rost_total_budget_2': round((total_data_2['total_budget'] - all_periods_avg['all_periods_avg_budget']) / all_periods_avg['all_periods_avg_budget'], 2) if all_periods_avg['all_periods_avg_budget'] else Decimal(0.0),
-        'rost_total_clicks_2': round((total_data_2['total_clicks'] - all_periods_avg['all_periods_avg_clicks']) / all_periods_avg['all_periods_avg_clicks'], 2) if all_periods_avg['all_periods_avg_clicks'] else Decimal(0.0),
-        'rost_total_leads_2': round((total_data_2['total_leads'] - all_periods_avg['all_periods_avg_leads']) / all_periods_avg['all_periods_avg_leads'], 2) if all_periods_avg['all_periods_avg_leads'] else Decimal(0.0),
-        'rost_total_unqualified_leads_2': round((total_data_2['total_unqualified_leads'] - all_periods_avg['all_periods_avg_unqualified_leads']) / all_periods_avg['all_periods_avg_unqualified_leads'], 2) if all_periods_avg['all_periods_avg_unqualified_leads'] else Decimal(0.0),
-        'rost_total_deals_2': round((total_data_2['total_deals'] - all_periods_avg['all_periods_avg_deals']) / all_periods_avg['all_periods_avg_deals'], 2) if all_periods_avg['all_periods_avg_deals'] else Decimal(0.0),
+        'rost_total_budget_2': round((total_data_2['total_budget'] - all_periods_avg['all_periods_avg_budget']) / all_periods_avg['all_periods_avg_budget'] * 100, 2) if all_periods_avg['all_periods_avg_budget'] else Decimal(0.0),
+        'rost_total_clicks_2': round((total_data_2['total_clicks'] - all_periods_avg['all_periods_avg_clicks']) / all_periods_avg['all_periods_avg_clicks'] * 100, 2) if all_periods_avg['all_periods_avg_clicks'] else Decimal(0.0),
+        'rost_total_leads_2': round((total_data_2['total_leads'] - all_periods_avg['all_periods_avg_leads']) / all_periods_avg['all_periods_avg_leads'] * 100, 2) if all_periods_avg['all_periods_avg_leads'] else Decimal(0.0),
+        'rost_total_unqualified_leads_2': round((total_data_2['total_unqualified_leads'] - all_periods_avg['all_periods_avg_unqualified_leads']) / all_periods_avg['all_periods_avg_unqualified_leads'] * 100, 2) if all_periods_avg['all_periods_avg_unqualified_leads'] else Decimal(0.0),
+        'rost_total_deals_2': round((total_data_2['total_deals'] - all_periods_avg['all_periods_avg_deals']) / all_periods_avg['all_periods_avg_deals'] * 100, 2) if all_periods_avg['all_periods_avg_deals'] else Decimal(0.0),
         'rost_total_qualified_deals_2': rost_total_qualified_deals_2,
-        'rost_total_failed_deals_2': round((total_data_2['total_failed_deals'] - all_periods_avg['all_periods_avg_failed_deals']) / all_periods_avg['all_periods_avg_failed_deals'], 2) if all_periods_avg['all_periods_avg_failed_deals'] else Decimal(0.0),
+        'rost_total_failed_deals_2': round((total_data_2['total_failed_deals'] - all_periods_avg['all_periods_avg_failed_deals']) / all_periods_avg['all_periods_avg_failed_deals'] * 100, 2) if all_periods_avg['all_periods_avg_failed_deals'] else Decimal(0.0),
         'rost_total_ignored_failed_deals_2': rost_total_ignored_failed_deals_2,
-        'rost_total_revenue_2': round((total_data_2['total_revenue'] - all_periods_avg['all_periods_avg_revenue']) / all_periods_avg['all_periods_avg_revenue'], 2) if all_periods_avg['all_periods_avg_revenue'] else Decimal(0.0),
-        'rost_avg_cpa_lead_2': round((presentation_data_2['avg_cpa_lead'] - all_periods_avg['all_periods_avg_cpa_lead']) / all_periods_avg['all_periods_avg_cpa_lead'], 2) if all_periods_avg['all_periods_avg_cpa_lead'] else Decimal(0.0),
-        'rost_avg_cpa_deal_2': round((presentation_data_2['avg_cpa_deal'] - all_periods_avg['all_periods_avg_cpa_deal']) / all_periods_avg['all_periods_avg_cpa_deal'], 2) if all_periods_avg['all_periods_avg_cpa_deal'] else Decimal(0.0),
-        'rost_avg_cpa_won_deal_2': round((presentation_data_2['avg_cpa_won_deal'] - all_periods_avg['all_periods_avg_cpa_won_deal']) / all_periods_avg['all_periods_avg_cpa_won_deal'], 2) if all_periods_avg['all_periods_avg_cpa_won_deal'] else Decimal(0.0),
-        'rost_roi_2': round((presentation_data_2['roi'] - all_periods_avg['roi']) / all_periods_avg['roi'], 2) if all_periods_avg['roi'] else Decimal(0.0),
+        'rost_total_revenue_2': round((total_data_2['total_revenue'] - all_periods_avg['all_periods_avg_revenue']) / all_periods_avg['all_periods_avg_revenue'] * 100, 2) if all_periods_avg['all_periods_avg_revenue'] else Decimal(0.0),
+        'rost_avg_cpa_lead_2': round((presentation_data_2['avg_cpa_lead'] - all_periods_avg['all_periods_avg_cpa_lead']) / all_periods_avg['all_periods_avg_cpa_lead'] * 100, 2) if all_periods_avg['all_periods_avg_cpa_lead'] else Decimal(0.0),
+        'rost_avg_cpa_deal_2': round((presentation_data_2['avg_cpa_deal'] - all_periods_avg['all_periods_avg_cpa_deal']) / all_periods_avg['all_periods_avg_cpa_deal'] * 100, 2) if all_periods_avg['all_periods_avg_cpa_deal'] else Decimal(0.0),
+        'rost_avg_cpa_won_deal_2': round((presentation_data_2['avg_cpa_won_deal'] - all_periods_avg['all_periods_avg_cpa_won']) / all_periods_avg['all_periods_avg_cpa_won'] * 100, 2) if all_periods_avg['all_periods_avg_cpa_won'] else Decimal(0.0),
+        'rost_roi_2': round((presentation_data_2['roi'] - all_periods_avg['all_periods_avg_roi']) / all_periods_avg['all_periods_avg_roi'] * 100, 2) if all_periods_avg['all_periods_avg_roi'] else Decimal(0.0),
         'rost_conversion_rate_clicks_to_leads_2': round(
-            (presentation_data_2['conversion_rate_clicks_to_leads'] - all_periods_avg['all_periods_avg_clicks_to_leads']) / all_periods_avg['all_periods_avg_clicks_to_leads'],
+            (presentation_data_2['conversion_rate_clicks_to_leads'] - all_periods_avg['all_periods_avg_cr_clicks_to_leads']) / all_periods_avg['all_periods_avg_cr_clicks_to_leads'] * 100,
             2
-        ) if all_periods_avg['all_periods_avg_clicks_to_leads'] else Decimal(0.0),
+        ) if all_periods_avg['all_periods_avg_cr_clicks_to_leads'] else Decimal(0.0),
         'rost_conversion_rate_leads_to_deals_2': round(
-            (presentation_data_2['conversion_rate_leads_to_deals'] - all_periods_avg['all_periods_avg_leads_to_deals']) / all_periods_avg['all_periods_avg_leads_to_deals'],
+            (presentation_data_2['conversion_rate_leads_to_deals'] - all_periods_avg['all_periods_avg_cr_leads_to_deals']) / all_periods_avg['all_periods_avg_cr_leads_to_deals'] * 100,
             2
-        ) if all_periods_avg['all_periods_avg_leads_to_deals'] else Decimal(0.0),
+        ) if all_periods_avg['all_periods_avg_cr_leads_to_deals'] else Decimal(0.0),
         'rost_direct_losses_ignored_2': rost_direct_losses_ignored_2,
         'rost_missed_profit_2': rost_missed_profit_2,
         'rost_revenue_per_qualified_deal_2': round(
-            (additional_data_2['revenue_per_qualified_deal'] - all_periods_avg['revenue_per_qualified_deal']) / all_periods_avg['revenue_per_qualified_deal'], 2) if all_periods_avg['revenue_per_qualified_deal'] else Decimal(0.0),
+            (additional_data_2['revenue_per_qualified_deal'] - all_periods_avg['all_periods_avg_avg_check']) / all_periods_avg['all_periods_avg_avg_check'] * 100, 2) if all_periods_avg['all_periods_avg_avg_check'] else Decimal(0.0),
         'rost_conversion_rate_unqualified_2': round(
-            (additional_data_2['conversion_rate_unqualified'] - all_periods_avg['all_periods_avg_unqualified']) / all_periods_avg['all_periods_avg_unqualified'], 2) if all_periods_avg['all_periods_avg_unqualified'] else Decimal(0.0),
+            (additional_data_2['conversion_rate_unqualified'] - all_periods_avg['all_periods_avg_cr_unqualified_leads']) / all_periods_avg['all_periods_avg_cr_unqualified_leads'] * 100, 2) if all_periods_avg['all_periods_avg_cr_unqualified_leads'] else Decimal(0.0),
         'rost_conversion_rate_qualified_leds_to_deals_2': round(
-            (additional_data_2['conversion_rate_qualified_leds_to_deals'] - all_periods_avg['all_periods_avg_qualified_leds_to_deals']) / all_periods_avg['all_periods_avg_qualified_leds_to_deals'],
+            (additional_data_2['conversion_rate_qualified_leds_to_deals'] - all_periods_avg['all_periods_avg_conversion_leads_to_quality']) / all_periods_avg['all_periods_avg_conversion_leads_to_quality'] * 100,
             2
-        ) if all_periods_avg['all_periods_avg_qualified_leds_to_deals'] else Decimal(0.0),
+        ) if all_periods_avg['all_periods_avg_conversion_leads_to_quality'] else Decimal(0.0),
         'rost_conversion_rate_qualified_deals_2': round(
-            (additional_data_2['conversion_rate_qualified_deals'] - all_periods_avg['all_periods_avg_qualified_deals']) / all_periods_avg['all_periods_avg_qualified_deals'],
+            (additional_data_2['conversion_rate_qualified_deals'] - all_periods_avg['all_periods_avg_conversion_meetings_to_quality']) / all_periods_avg['all_periods_avg_conversion_meetings_to_quality'] * 100,
             2
-        ) if all_periods_avg['all_periods_avg_qualified_deals'] else Decimal(0.0),
+        ) if all_periods_avg['all_periods_avg_conversion_meetings_to_quality'] else Decimal(0.0),
         'rost_conversion_rate_failed_deals_2': rost_conversion_rate_failed_deals_2,
         'rost_conversion_rate_ignored_failed_deals_2': rost_conversion_rate_ignored_failed_deals_2,
     }

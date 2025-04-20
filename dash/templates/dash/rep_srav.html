@@ -345,13 +345,13 @@
           </tr>
           <tr class="table-group-divider">
             <td><strong>Средние показатели</strong></td>
-            <td><strong>{{ all_periods_avg_clicks_to_leads|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_leads_to_deals|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_unqualified|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_qualified_leds_to_deals|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_qualified_deals|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_failed_deals|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_ignored_failed_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_cr_clicks_to_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_cr_leads_to_deals|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_cr_unqualified_leads|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_conversion_leads_to_quality|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_conversion_meetings_to_quality|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_deals_failure_rate|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_deals_failure_due_to_ignored|default:"Н/Д" }}</strong></td>
           </tr>
           <tr>
             <td><strong>% изменения 2 относительно 1</strong></td>
@@ -449,10 +449,10 @@
             <td><strong>Средние показатели</strong></td>
             <td><strong>{{ all_periods_avg_budget }}</strong></td>
             <td><strong>{{ all_periods_avg_revenue }}</strong></td>
-            <td><strong>{{ all_periods_avg_cpa_lead|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_cpa_lead }}</strong></td>
             <td><strong>{{ all_periods_avg_cpa_deal|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_cpa_won_deal|default:"Н/Д" }}</strong></td>
-            <td><strong>{{ all_periods_avg_qualified_deal|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_cpa_won|default:"Н/Д" }}</strong></td>
+            <td><strong>{{ all_periods_avg_avg_check|default:"Н/Д" }}</strong></td>
             <td><strong>{{ all_periods_avg_direct_losses_ignored|default:"Н/Д" }}</strong></td>
             <td><strong>{{ all_periods_avg_missed_profit|default:"Н/Д" }}</strong></td>
             <td><strong>{{ all_periods_avg_roi|default:"Н/Д" }}</strong></td>
@@ -473,7 +473,7 @@
             <td><strong>% изменения относительно средних показателей	</strong></td>
             <td class="table-{% if rost_total_budget_2 > 0 %}danger{% elif rost_total_budget_2 < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_total_budget_2 }}</strong></td>
             <td class="table-{% if rost_total_revenue_2 > 0 %}success{% elif rost_total_revenue_2 < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_total_revenue_2 }}</strong></td>
-            <td class="table-{% if rost_avg_cpa_lead_2 > 0 %}danger{% elif rost_avg_cpa_lead_2 < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_avg_cpa_lead_2|default:"Н/Д" }}</strong></td>
+            <td class="table-{% if rost_avg_cpa_lead_2 > 0 %}danger{% elif rost_avg_cpa_lead_2 < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_avg_cpa_lead_2 }}</strong></td>
             <td class="table-{% if rost_avg_cpa_deal_2 > 0 %}danger{% elif rost_avg_cpa_deal_2 < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_avg_cpa_deal_2|default:"Н/Д" }}</strong></td>
             <td class="table-{% if rost_avg_cpa_won_deal_2 > 0 %}danger{% elif rost_avg_cpa_won_deal_2 < 0 %}success{% else %}secondary{% endif %}"><strong>{{ rost_avg_cpa_won_deal_2|default:"Н/Д" }}</strong></td>
             <td class="table-{% if rost_revenue_per_qualified_deal_2 > 0 %}success{% elif rost_revenue_per_qualified_deal_2 < 0 %}danger{% else %}secondary{% endif %}"><strong>{{ rost_revenue_per_qualified_deal_2|default:"Н/Д" }}</strong></td>
