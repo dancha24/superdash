@@ -238,11 +238,11 @@ class Report(models.Model):
     @classmethod
     def get_value_field(cls, data_type, field_name, **params):
         _reports = cls.get_reports_by_params(**params)
-        if field_name == 'failed_deals':
+        if field_name in ('failed_deals', 'deals_failure_rate'):
             _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=12, year=2023))
-        elif field_name == 'ignored_failed_deals':
+        elif field_name in ('ignored_failed_deals', 'deals_failure_due_to_ignored', 'direct_losses_ignored', 'missed_profit'):
             _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=3, year=2024))
-        elif field_name == 'revenue':
+        elif field_name in ('revenue', 'avg_check', 'roi'):
             _reports = _reports.filter(start_period__gte=datetime.date(day=1, month=5, year=2023))
         if data_type == 'avg':
             value = _reports.aggregate(Avg(field_name))[f'{field_name}__avg'] or 0
