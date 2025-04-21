@@ -233,7 +233,7 @@ class Report(models.Model):
                 else:
                     _field = f'{field_name}__in'
                 _reports = _reports.filter(**{_field: params[field_name]})
-        return _reports  # .order_by('start_period', 'end_period')
+        return _reports
 
     @classmethod
     def get_value_field(cls, data_type, field_name, **params):

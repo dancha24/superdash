@@ -43,10 +43,10 @@
 
             <div class="col-md mb-6">
               <div class="form-floating form-floating-outline">
-                <label for="year">Год:</label>
-                <select required id="year" name="year" class="selectpicker w-100" data-style="btn-default">
+                <label for="year2">Год:</label>
+                <select required id="year2" name="year2" class="selectpicker w-100" data-style="btn-default">
                   {% for y in years %}
-                  <option value="{{ y }}" {% if y in year %}selected{% endif %}>{{ y }}</option>
+                  <option value="{{ y }}" {% if y in year2 %}selected{% endif %}>{{ y }}</option>
                   {% endfor %}
                 </select>
               </div>
@@ -54,10 +54,10 @@
 
             <div class="col-md mb-6">
               <div class="form-floating form-floating-outline">
-                <label for="month">Месяц:</label>
-                <select required id="month" name="month" class="selectpicker w-100" data-style="btn-default">
+                <label for="month2">Месяц:</label>
+                <select required id="month2" name="month2" class="selectpicker w-100" data-style="btn-default">
                   {% for m, month_name in months %}
-                  <option value="{{ m }}" {% if m in month %}selected{% endif %}>{{ month_name }}</option>
+                  <option value="{{ m }}" {% if m in month2 %}selected{% endif %}>{{ month_name }}</option>
                   {% endfor %}
                 </select>
               </div>

@@ -135,37 +135,37 @@ class ReportRus(TemplateView):
         # A function to init the global layout. It is defined in web_project/__init__.py file
         context = TemplateLayout.init(self, super().get_context_data(**kwargs))
 
-        year, month, segment, site = filters(self)  # получаем фильтры из адресной строки
-        year, month = list(year), list(month)
+        year2, month2, segment2, site2 = filters(self, '2')  # получаем фильтры из адресной строки
+        year2, month2 = list(year2), list(month2)
 
-        if not month:
+        if not month2:
             if datetime.now().month == 1:
-                month.append(12)
-                year.append(str(datetime.now().year - 1))
+                month2.append(12)
+                year2.append(str(datetime.now().year - 1))
             else:
-                year.append(str(datetime.now().year))
-                month.append(datetime.now().month - 1)
+                year2.append(str(datetime.now().year))
+                month2.append(datetime.now().month - 1)
 
-        year, month = tuple(year), tuple(month)
+        year2, month2 = tuple(year2), tuple(month2)
 
         # Получаем текущий год и месяц
-        current_year = int(year[0]) if year else datetime.now().year
-        current_month = int(month[0]) if month else datetime.now().month
+        current_year = int(year2[0]) if year2 else datetime.now().year
+        current_month = int(month2[0]) if month2 else datetime.now().month
 
-        year2 = []
-        month2 = []
-        segment2 = tuple()
-        site2 = tuple()
+        year = []
+        month = []
+        segment = tuple()
+        site = tuple()
 
         # Вычисляем предыдущий месяц
         if current_month == 1:
-            year2.append(str(current_year - 1))
-            month2.append(12)
+            year.append(str(current_year - 1))
+            month.append(12)
         else:
-            year2.append(str(current_year))
-            month2.append(current_month - 1)
+            year.append(str(current_year))
+            month.append(current_month - 1)
 
-        year2, month2 = tuple(year2), tuple(month2)
+        year, month = tuple(year), tuple(month)
 
         report_data = get_report_data_by_two_periods([year, month, segment, site], [year2, month2, segment2, site2])
 
